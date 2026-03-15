@@ -3,14 +3,15 @@
   ...
 }:
 {
-  home.packages = [
+  home.packages = with pkgs-unstable; [
     # Qwen
-    pkgs-unstable.qwen-code
+    qwen-code
 
     # Microsoft
-    pkgs-unstable.github-copilot-cli
+    github-copilot-cli
 
     # Open source
-    pkgs-unstable.opencode
+    opencode
+    promptfoo
   ];
 }
