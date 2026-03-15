@@ -1,0 +1,1 @@
+/Users/khrore/nixos/dotfiles/common/.codex/skills/clean-architecture/references/entities-use-cases.md

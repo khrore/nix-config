@@ -1,0 +1,1 @@
+/Users/khrore/nixos/dotfiles/common/.codex/skills/memory-safety-patterns/SKILL.md
