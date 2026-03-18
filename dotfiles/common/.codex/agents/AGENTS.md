@@ -12,7 +12,7 @@ Use this file as a lightweight playbook to keep stage outputs consistent and eas
 
 This file does not replace:
 
-- `workflow-orchestrator.md` for queue control and loop routing
+- `main-thread-orchestration.md` for automatic queue control and loop routing by the main Codex thread
 - stage prompts (`analyzer`, `researcher`, `planner`, `coder`, `reviewer`, `tester`, `technical-writer`, `summarizer`) for role-specific rules
 - workflow docs in `docs/workflow/` for canonical schema and policy definitions
 - parent `../AGENTS.md` for shared engineering standards
@@ -26,6 +26,12 @@ If there is a conflict, follow the shared workflow docs first, then the stage pr
 Default queue:
 
 `analyzer -> researcher -> planner -> coder -> reviewer -> tester -> technical-writer -> summarizer`
+
+Codex operating model:
+
+- the main Codex thread automatically handles decomposition, spawn decisions, and result merging
+- child agents should receive validated task packets from `docs/workflow/`
+- `fork_context=false` is the default unless a narrow follow-up requires inherited context
 
 Common loop:
 
@@ -42,10 +48,12 @@ Escalation is context-driven via workflow settings (for example `escalation_poli
 Every handoff should be easy for the next stage to execute without guessing.
 
 - Keep outputs concise and structured; prefer short lists over long prose.
+- Prefer packet fields and evidence over free-form narrative summaries.
 - State assumptions explicitly; do not hide them in narrative text.
 - Call out unknowns that can change implementation behavior.
 - Include evidence references (files, checks, observations), not just conclusions.
 - If work is skipped, state what was skipped and why.
+- Report scoped `read_set` and `write_set` boundaries whenever child work is delegated.
 
 Recommended status vocabulary:
 
@@ -104,6 +112,8 @@ Example, bad:
 - Preserve useful context from upstream; do not force downstream stages to rediscover it.
 - Prefer smallest-change guidance that still satisfies acceptance criteria.
 - Keep language neutral and operational; avoid performative commentary.
+- Reuse an existing child agent only for same-scope remediation; start a fresh child for unrelated work.
+- Close child agents when their scoped task is complete instead of letting them accumulate stale context.
 
 ---
 
@@ -125,19 +135,22 @@ Planner:
 
 - produce executable steps
 - align validation depth with risk
-- choose appropriate coder path
+- choose appropriate child-agent path
+- split into bounded work items with clear ownership and dependencies
 
 Coder:
 
 - implement only approved scope
 - keep changes focused and reversible
 - report exactly what changed
+- run the packet-defined self-repair loop before handoff
 
 Reviewer:
 
 - decide: approved, changes_required, or blocked
 - provide concrete remediation when not approved
 - include acceptance checks for each fix item
+- review the result against the task packet, not against the whole thread
 
 Tester:
 
@@ -165,5 +178,6 @@ Summarizer:
 - Avoid repeating unchanged context from earlier stages.
 - Use stable field names and ordering when possible.
 - Keep examples short and directly relevant to the active task.
+- Prefer task packets, work plans, and worker results from `docs/workflow/` over ad hoc prompt prose.
 
 This playbook is intentionally lightweight. Add guidance here only when it improves cross-stage clarity.

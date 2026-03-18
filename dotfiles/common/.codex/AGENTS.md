@@ -3,7 +3,7 @@
 - Audience: All coding agents and language models (model-agnostic memory file).
 - Scope: Backend-focused standards for software delivery across multiple languages.
 - Philosophy: Make illegal states unrepresentable where practical. Type safety and validation before velocity.
-- Last Updated: 2026-02-19
+- Last Updated: 2026-03-17
 
 ______________________________________________________________________
 
@@ -88,6 +88,7 @@ All normative rules use this schema:
 | CORE-08 | MUST | Stop and escalate if unexpected external changes appear in touched files. | Process control | Explicit stop note in report | Not applicable |
 | CORE-09 | MUST | Depend on abstractions at boundaries and multi-implementation seams; avoid speculative abstractions before Rule of Three. | Review | Boundary interfaces and usage count rationale | Section 14 exception request |
 | CORE-10 | MUST | Reports include: What changed, Why, Validation run, Residual risk, Assumptions. | Process control | Final report sections present | Not applicable |
+| CORE-11 | MUST | Exhaust local self-validation and remediation loops before escalating routine scoped work. | Process + command run | Recorded formatter/linter/type/build/test loop and result classification | Section 14 exception request |
 
 ### 4.3 Enforcement Matrix (Top Rules)
 
@@ -98,6 +99,7 @@ All normative rules use this schema:
 | No runtime unwrap/expect misuse (Rust) | Clippy + review | `cargo clippy` output and code scan |
 | No broad except swallowing (Python) | Ruff + review | `ruff check` output and exception handling diff |
 | Validation execution by risk tier | Process + command run | Recorded commands/results per tier |
+| Self-validation before escalation | Process + command run | Formatter/linter/type/build/test loop and failure classification in report |
 | Stop on unexpected external changes | Process control | Explicit stop/escalation note in report |
 
 ______________________________________________________________________
@@ -120,7 +122,7 @@ For every non-trivial request:
 - Define files to touch, behavior changes, validation, and risks.
 
 4. Gate
-- Apply risk-tier approval rules before writes.
+- Apply risk-tier approval rules before writes, favoring self-validation over routine human confirmation for scoped work.
 
 5. Implement
 - Make minimal, reversible changes.
@@ -139,30 +141,67 @@ For every non-trivial request:
 | Tier | Typical Changes | Minimum Validation | Approval Gate |
 |---|---|---|---|
 | Low | Local refactor, docs, non-behavioral cleanup | Targeted checks or tests for touched area | No extra gate when user explicitly requested implementation |
-| Medium | Behavioral change in existing module, non-breaking API internals | Profile default checks + targeted tests | Confirm if assumptions materially affect behavior |
+| Medium | Behavioral change in existing module, non-breaking API internals | Profile default checks + targeted tests + remediation loop when checks fail | No extra gate when scope is explicit, ownership is bounded, and validation passes; confirm only when unresolved assumptions materially affect behavior |
 | High | Persistence, concurrency model, security paths, migrations, public interfaces | Full profile checks + targeted integration tests + rollback notes | Explicit user confirmation required before mutating |
 
 ### 5.3 Gate Rules
 
 - MUST gate before writing high-risk changes.
-- SHOULD gate medium-risk changes when assumptions are unresolved.
+- SHOULD gate medium-risk changes only when assumptions remain unresolved after reasonable self-validation.
 - MAY proceed immediately for low-risk changes after inspection when implementation is explicitly requested.
+- MUST prefer the safest locally verifiable assumption and record it when medium-risk work can proceed without expanding scope.
 
 ______________________________________________________________________
 
-## 6. Agent Governance (Autonomy Budget, Stop Conditions, Reporting Contract)
+## 6. Agent Governance (Autonomy Budget, Automatic Delegation, Stop Conditions, Reporting Contract)
 
 ### 6.1 Autonomy Budget
 
-Without re-confirmation, an agent SHOULD stay within all of:
+Without re-confirmation, an agent SHOULD initially aim to stay within all of:
 
 1. Up to 3 files changed.
 2. Up to 200 net lines changed.
 3. No public API contract changes.
 
-If any threshold is exceeded, the agent MUST pause and request confirmation.
+If any threshold is exceeded, the agent MAY continue without confirmation only when all of the following hold:
 
-### 6.2 Stop Conditions
+1. Scope is still coherent and explicitly bounded.
+2. No newly discovered public API, migration, or security-sensitive impact appears.
+3. The agent can complete meaningful self-validation for the expanded change.
+4. The final report explicitly records the scope expansion and why it was needed.
+
+If those conditions do not hold, the agent MUST pause and request confirmation.
+
+### 6.2 Automatic Delegation Policy
+
+For non-trivial implementation work, the main Codex thread MUST use a multiagent execution pattern by default rather than keeping all work local.
+
+Default execution model:
+
+1. Main thread inspects scope, risk, and likely write set.
+2. Main thread delegates at least one concrete subtask to a worker-style sub-agent when the task includes code changes, validation work, review work, or other bounded parallelizable work.
+3. Main thread reserves local work for integration, conflict resolution, risk decisions, and final reporting.
+4. Main thread MUST create a dedicated self-verification loop through either:
+- a verifier/tester/reviewer sub-agent, or
+- a separate delegated validation pass owned by a sub-agent distinct from the primary implementation agent.
+5. The verification sub-agent MUST run or explicitly assess, when applicable:
+- formatter check
+- linter check
+- type or LSP-equivalent check
+- build/compile check
+- targeted tests
+- broader tests when risk or scope requires
+6. The main thread MUST review verifier results and either remediate failures locally or delegate remediation before finalizing.
+
+Delegation exceptions:
+
+1. The task is trivial and can be completed safely with no meaningful benefit from delegation.
+2. The environment exposes no usable sub-agent capability.
+3. The task is so tightly coupled that delegation would create more coordination risk than execution value.
+
+If an exception is used, the final report MUST state why automatic delegation was skipped.
+
+### 6.3 Stop Conditions
 
 Agent MUST stop and ask before continuing when any of the following occurs:
 
@@ -170,9 +209,11 @@ Agent MUST stop and ask before continuing when any of the following occurs:
 2. Planned change affects public interfaces not in approved scope.
 3. Persistence schema or migration impact is discovered unexpectedly.
 4. Security-critical behavior must change without explicit requirement.
-5. Validation cannot be completed for reasons that materially affect confidence.
+5. Validation remains materially incomplete after exhausting reasonable local checks and remediation loops.
 
-### 6.3 Reporting Contract
+Agent SHOULD continue without asking when validation failures are routine, scoped, and remediable through local iteration.
+
+### 6.4 Reporting Contract
 
 Every completed task report MUST include:
 
@@ -234,6 +275,25 @@ ______________________________________________________________________
 - MUST validate behavior changes, not only compile/type success.
 - MUST test error paths with specific expected outcomes.
 - SHOULD test boundaries and failure modes for medium/high-risk changes.
+- MUST run local self-validation in a repair loop before escalating routine scoped failures.
+
+### 9.1.1 Self-Validation Loop
+
+For routine scoped implementation work, agents SHOULD iterate through:
+
+1. formatter check
+2. linter check
+3. type or LSP-equivalent check when available
+4. compile/build check when applicable
+5. targeted tests for changed behavior
+6. broader checks only when risk or scope requires
+
+Loop policy:
+
+- MUST classify failures as introduced, pre-existing, environment/tooling, or scope-expanding.
+- MUST self-fix introduced failures that can be resolved within the approved scope.
+- SHOULD repeat the loop until checks pass or repeated unchanged failures indicate escalation is necessary.
+- MUST report skipped or blocked checks with confidence impact.
 
 ### 9.2 Validation by Risk Tier
 
@@ -417,14 +477,18 @@ This document uses semantic-style policy versioning:
 
 ### 15.2 Current Version Notes
 
-- Version: 2.0.0
-- Date: 2026-02-19
+- Version: 2.1.1
+- Date: 2026-03-18
 - Summary:
   - Reorganized into language-agnostic core + Rust + Python profiles.
   - Resolved priority and `.expect()` policy conflicts.
   - Added explicit risk-tier execution model and approval gates.
   - Added rule schema and enforcement matrix with evidence expectations.
   - Added autonomy budget, stop conditions, and reporting contract.
+  - Relaxed routine autonomy limits for scoped, self-validated work.
+  - Shifted medium-risk execution toward validate-first autonomy instead of default human confirmation.
+  - Added explicit self-validation loop requirements before escalation.
+  - Added automatic multiagent delegation and distinct verification sub-agent requirements for non-trivial implementation work.
 
 ### 15.3 Changelog Entry Template
 
@@ -445,7 +509,7 @@ This file remains the shared standards memory for all Codex workflow agents unde
 Workflow coordination is split into dedicated files:
 
 - `./agents/AGENTS.md`: lightweight multiagent playbook for handoff quality and routing hygiene
-- `./agents/workflow-orchestrator.md`: queue control, escalation handling, and reviewer loop routing
+- `./agents/main-thread-orchestration.md`: automatic queue control, escalation handling, and reviewer loop routing by the main Codex thread
 - `./agents/*.md`: stage-specific prompts for analyzer, researcher, planner, coder, reviewer, tester, technical-writer, and summarizer roles
 
 Workflow policy, schema, and adapter contracts remain canonical in `docs/workflow/`.
