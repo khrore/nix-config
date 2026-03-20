@@ -1,34 +1,144 @@
-# nixos-conf
+# nixos
 
-## Multiagent workflow
+Personal multi-host Nix flake for Linux and macOS. It combines `nixpkgs`, `nix-darwin`, Home Manager, `agenix`, host-specific modules, and a shared dotfiles layer to provision a full workstation rather than a single machine profile.
 
-This repository now includes a portable multiagent workflow spec used for OpenCode and
-adapter-ready for Codex and Claude-style runtimes.
+## What This Repo Defines
 
-Key docs:
+- NixOS hosts: `dev-4`, `nixos`
+- Darwin host: `macix`
+- Shared system layer in `hosts/common`
+- Shared Home Manager layer in `home`
+- Shared helper library in `lib`
+- Shared and platform-specific dotfiles in `dotfiles`
+- Multiagent workflow docs and runtime configs under `docs/workflow` and hidden files in `dotfiles/common`
 
-- `docs/workflow/core-spec.md`
-- `docs/workflow/handoff-schema.md`
-- `docs/workflow/policy.md`
-- `docs/workflow/adapter-mapping.md`
-- `docs/workflow/implementation-plan.md`
+The flake entrypoint is [flake.nix](/Users/khrore/nixos/flake.nix). Host definitions are wired into `nixosConfigurations` and `darwinConfigurations`, with common `specialArgs` such as `hostName`, `username`, `system`, `pkgs-unstable`, and `mylib`.
 
-Adapter notes:
+## Main Stack
 
-- `docs/workflow/adapters/opencode.md`
-- `docs/workflow/adapters/codex.md`
-- `docs/workflow/adapters/claude.md`
+This config is built around:
 
-OpenCode runtime files:
+- `nixpkgs` and `nixpkgs-unstable` for packages
+- `nix-darwin` for macOS system management
+- Home Manager for user-level packages and dotfiles
+- `disko` for Linux disk layout
+- `agenix` plus a private `secrets` flake for secret material
+- Homebrew on macOS for native apps that are better managed outside Nix
 
-- config: `dotfiles/common/.config/opencode/opencode.json`
-- agents: `dotfiles/common/.config/opencode/agents/`
+The helper library in [lib/default.nix](/Users/khrore/nixos/lib/default.nix) provides:
 
-Workflow queue:
+- `scanPaths` to auto-import module directories
+- `scanFiles` to walk dotfile trees
+- `linkDotfiles` plus platform predicates for Linux/Darwin splits
 
-`analyzer -> researcher -> planner -> coder -> reviewer -> tester -> technical-writer -> summarizer`
+## Main Tasks This Config Covers
 
-Runtime controls set at workflow creation:
+- Bootstrap a new workstation
+- Manage Linux and macOS machines from one flake
+- Install a development environment with shells, editors, formatters, linters, and language servers
+- Configure a Linux desktop around Hyprland and Wayland tools
+- Configure a macOS machine with `nix-darwin` defaults and Homebrew apps
+- Link shared dotfiles into `$HOME`
+- Provide AI and agent tooling such as `opencode`, `qwen-code`, and workflow runtime files
 
-- `escalation_policy`: `strict | balanced | relaxed`
-- `max_review_cycles`: integer (default `3`)
+## Tooling Included
+
+The shared Home Manager package bundles are under [home/pkgs](/Users/khrore/nixos/home/pkgs).
+
+Highlights:
+
+- Shell and CLI: `atuin`, `zoxide`, `starship`, `tmux`, `fzf`, `bat`, `ripgrep`, `fd`, `eza`
+- Editors and terminals: `neovim`, `kitty`, `ghostty`, `zed-editor`
+- AI tools: `opencode`, `qwen-code`, `github-copilot-cli`, `promptfoo`
+- Dev tooling: `clang`, `nil`, `nixd`, `nixfmt`, `ruff`, `basedpyright`, `bash-language-server`, `vtsls`, `eslint`, `prettierd`, `cmake`, `gnumake`
+- Network and ops: `git`, `gh`, `mtr`, `iperf3`, `socat`, `nmap`, `openssl`
+- Linux desktop: `hyprland`, `waybar`, `dunst`, `rofi`, `hyprlock`, `hypridle`, `hyprpaper`, `localsend`, `throne`
+- macOS native apps through Homebrew: `aerospace`, `docker-desktop`, `ghostty`, `zed`, `codex`, `zen@twilight`
+
+## Repo Structure
+
+- [hosts](/Users/khrore/nixos/hosts): host entrypoints and shared system modules
+- [home](/Users/khrore/nixos/home): Home Manager entrypoint, package bundles, and dotfile activation
+- [lib](/Users/khrore/nixos/lib): helper functions used across the flake
+- [dotfiles](/Users/khrore/nixos/dotfiles): source files linked into the user home directory
+- [docs/workflow](/Users/khrore/nixos/docs/workflow): multiagent workflow specification and adapter docs
+
+Composition flow:
+
+1. `flake.nix` selects a host.
+2. The host imports `hosts/common/default.nix`.
+3. `hosts/common/default.nix` imports shared system modules and `home/default.nix`.
+4. `home/default.nix` imports all package bundles and `home/link-dotfiles.nix`.
+5. Dotfiles are linked from `dotfiles/common` and the active platform directory.
+
+## Using This In Your Own Environment
+
+This repo is personal, so using it unchanged on another machine will usually fail unless you adapt it. The main blockers are the private `secrets` input, host-specific hardware modules, usernames, disk layout, and some machine-specific assumptions.
+
+Recommended path:
+
+1. Fork or copy the repository.
+2. Update the host map in [flake.nix](/Users/khrore/nixos/flake.nix) with your own host name, username, and target system.
+3. Remove or replace the private `secrets` input if you do not have access to `git@github.com/khrore/nixrets.git`.
+4. Replace Linux hardware files and `disko` definitions under your host directory.
+5. Review shared modules in [hosts/common](/Users/khrore/nixos/hosts/common) and disable anything you do not want globally, especially Hyprland, Docker, `localsend`, `throne`, SSH, and age secret paths.
+6. Trim or replace package bundles in [home/pkgs](/Users/khrore/nixos/home/pkgs) to match your workload.
+7. Add or replace files in [dotfiles](/Users/khrore/nixos/dotfiles) with your own configs.
+
+## Bootstrap Commands
+
+### NixOS
+
+After cloning the repo to `$HOME/nixos` or setting `NIXOS_CONFIG_ROOT`:
+
+```bash
+sudo nixos-rebuild switch --flake .#your-host
+```
+
+For first install on bare metal, you will also need your own hardware config and, if you keep it, a matching `disko` layout.
+
+### macOS
+
+Install Nix and `nix-darwin`, then apply:
+
+```bash
+darwin-rebuild switch --flake .#your-host
+```
+
+The Darwin host in this repo also enables Homebrew integration, so the initial activation expects Homebrew-compatible settings and a valid primary user.
+
+## Dotfiles Behavior
+
+Dotfiles are linked by Home Manager via [home/link-dotfiles.nix](/Users/khrore/nixos/home/link-dotfiles.nix). At activation time the script searches for the repo in:
+
+- `$NIXOS_CONFIG_ROOT`
+- `$HOME/nixos`
+- `$HOME/.config/nixos`
+- or a nearby checkout under `$HOME`
+
+Platform-specific files override `dotfiles/common` by relative path. Existing non-symlink files in `$HOME` are left in place and reported as warnings.
+
+## Validation
+
+Smallest relevant checks after changes:
+
+```bash
+nix flake check
+nixos-rebuild build --flake .#dev-4
+nixos-rebuild build --flake .#nixos
+darwin-rebuild build --flake .#macix
+```
+
+Some evaluation paths may still require access to the private `secrets` flake.
+
+## Multiagent Workflow Files
+
+This repo also contains a portable multiagent workflow spec. The main docs are:
+
+- [docs/workflow/core-spec.md](/Users/khrore/nixos/docs/workflow/core-spec.md)
+- [docs/workflow/handoff-schema.md](/Users/khrore/nixos/docs/workflow/handoff-schema.md)
+- [docs/workflow/policy.md](/Users/khrore/nixos/docs/workflow/policy.md)
+- [docs/workflow/adapter-mapping.md](/Users/khrore/nixos/docs/workflow/adapter-mapping.md)
+- [docs/workflow/implementation-plan.md](/Users/khrore/nixos/docs/workflow/implementation-plan.md)
+
+Runtime-specific configs live under hidden files in `dotfiles/common`, including OpenCode and Codex agent configuration.
