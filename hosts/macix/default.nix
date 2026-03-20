@@ -1,7 +1,7 @@
 {
   pkgs,
   shell,
-  hostname,
+  hostName,
   username,
   ...
 }:
@@ -14,15 +14,12 @@
 
   # Hostname
   networking = {
-    hostName = hostname;
-    computerName = hostname;
-    localHostName = hostname;
+    inherit hostName;
+    computerName = hostName;
+    localHostName = hostName;
   };
 
   system = {
-    # Basic nix-darwin settings
-    stateVersion = 5;
-
     # Set primary user (required for homebrew and system defaults)
     primaryUser = username;
 

@@ -1,4 +1,6 @@
-{ mylib, ... }:
 {
-  imports = mylib.scanPaths ./.;
+  imports = [
+    ./nix.nix
+    ./timezone.nix
+  ];
 }

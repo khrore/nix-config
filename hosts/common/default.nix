@@ -1,10 +1,12 @@
 {
   lib,
   stateVersion,
-  hostname,
+  hostName,
   username,
   system,
   mylib,
+  pkgs-unstable,
+  shell,
   ...
 }:
 let
@@ -13,19 +15,25 @@ in
 {
   # You can import other NixOS modules here
   imports = [
-    # You can also split up your configuration and import pieces of it here:
     ./modules
-
-    # Import important packages
     ./nixpkgs-config.nix
-
     ../../home
   ];
 
-  nixpkgs.config.allowUnfree = true;
-
   networking = lib.mkIf (mylib.isLinux system) {
-    hostName = hostname;
+    inherit hostName;
+  };
+
+  users = lib.optionalAttrs (mylib.isLinux system) {
+    defaultUserShell = pkgs-unstable.${shell};
+    users.${username} = {
+      isNormalUser = true;
+      extraGroups = [
+        "wheel"
+        "networkmanager"
+        "docker"
+      ];
+    };
   };
 
   # if you changed this key, you need to regenerate all encrypt files from the decrypt contents!
@@ -39,9 +47,7 @@ in
     path = "${userHome}/.local/share/atuin/shared_key";
   };
 
-  services.openssh = {
-    enable = true;
-  };
+  services.openssh.enable = true;
 
   system.stateVersion =
     if mylib.isDarwin system then

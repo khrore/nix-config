@@ -1,17 +1,62 @@
-{ pkgs, lib, mylib, system, ... }:
+{
+  config,
+  pkgs,
+  lib,
+  mylib,
+  system,
+  ...
+}:
 
 let
-  platform = if mylib.isDarwin system then "darwin"
-             else if mylib.isLinux system then "nixos"
-             else "common";
+  platform =
+    if mylib.isDarwin system then
+      "darwin"
+    else if mylib.isLinux system then
+      "nixos"
+    else
+      "common";
+  homeDir = config.home.homeDirectory;
 
   runtimeLinkingLogic = ''
+    find_repo_root() {
+      local candidate
+
+      for candidate in \
+        "''${NIXOS_CONFIG_ROOT:-}" \
+        "${homeDir}/nixos" \
+        "${homeDir}/.config/nixos"
+      do
+        if [ -n "$candidate" ] && [ -d "$candidate/dotfiles" ] && [ -f "$candidate/flake.nix" ]; then
+          printf '%s\n' "$candidate"
+          return 0
+        fi
+      done
+
+      while IFS= read -r candidate; do
+        candidate="$(dirname "$candidate")"
+        if [ -d "$candidate/dotfiles" ] && [ -f "$candidate/flake.nix" ]; then
+          printf '%s\n' "$candidate"
+          return 0
+        fi
+      done < <(find "${homeDir}" -maxdepth 3 -name flake.nix -type f 2>/dev/null)
+
+      return 1
+    }
+
     link_dotfiles_runtime() {
-      local dotfiles_root="$HOME/nixos/dotfiles"
-      local common_dir="$dotfiles_root/common"
-      local platform_dir="$dotfiles_root/${platform}"
+      local repo_root dotfiles_root common_dir platform_dir
       local rel subdir source target prefix
       declare -A sources=()
+
+      repo_root="$(find_repo_root || true)"
+      if [ -z "$repo_root" ]; then
+        echo "Dotfiles repo not found. Set NIXOS_CONFIG_ROOT to override automatic discovery."
+        return 0
+      fi
+
+      dotfiles_root="$repo_root/dotfiles"
+      common_dir="$dotfiles_root/common"
+      platform_dir="$dotfiles_root/${platform}"
 
       if [ -d "$common_dir" ]; then
         while IFS= read -r -d "" file; do
@@ -34,7 +79,7 @@ let
         return 0
       fi
 
-      echo "Processing ''${#sources[@]} dotfile entries..."
+      echo "Processing ''${#sources[@]} dotfile entries from $repo_root..."
 
       while IFS= read -r rel; do
         subdir="''${sources["$rel"]}"

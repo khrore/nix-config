@@ -44,37 +44,28 @@
 
   outputs =
     {
-      self,
       nixpkgs,
       darwin,
       home-manager,
       ...
     }@inputs:
     let
-      inherit (self) outputs;
-
-      # System architectures
-      linuxSystem = "x86_64-linux";
-      darwinSystem = "aarch64-darwin";
       stateVersion = "26.05";
+      nixpkgsConfig = {
+        allowUnfree = true;
+        nvidia.acceptLicense = true;
+      };
 
-      # Helper to create pkgs for a system
-      mkPkgs =
-        system:
-        import nixpkgs {
+      mkPkgsFor =
+        nixpkgsSource: system:
+        import nixpkgsSource {
           inherit system;
-          config = {
-            allowUnfree = true;
-            nvidia.acceptLicense = true;
-          };
+          config = nixpkgsConfig;
         };
 
       mkPkgsUnstable =
         system:
-        import inputs.nixpkgs-unstable {
-          inherit system;
-          config.allowUnfree = true;
-        };
+        mkPkgsFor inputs.nixpkgs-unstable system;
 
       # importing library
       mylib = import ./lib/default.nix { inherit (nixpkgs) lib; };
@@ -92,80 +83,91 @@
       # Common special args factory
       mkSpecialArgs =
         {
-          hostname,
+          hostName,
           username,
           system,
         }:
         {
           inherit
-            hostname
             username
             system
             inputs
-            outputs
             terminalEditor
             stateVersion
             configurationLimit
             shell
             mylib
+            nixpkgsConfig
+            hostName
             ;
           pkgs-unstable = mkPkgsUnstable system;
         };
-    in
-    {
-      nixpkgs.pkgs = mkPkgs linuxSystem;
 
-      # NixOS configurations
-      nixosConfigurations = {
-        "dev-4" = nixpkgs.lib.nixosSystem {
-          system = linuxSystem;
-          modules = [
-            ./hosts/dev-4
-            inputs.disko.nixosModules.disko
-            inputs.agenix.nixosModules.age
-            inputs.secrets.nixosModules.default
-            home-manager.nixosModules.home-manager
-          ];
-          specialArgs = mkSpecialArgs {
-            username = "khrore";
-            hostname = "dev-4";
-            system = linuxSystem;
-          };
-        };
-
-        "nixos" = nixpkgs.lib.nixosSystem {
-          system = linuxSystem;
-          modules = [
-            ./hosts/nixos
-            inputs.disko.nixosModules.disko
+      mkNixosConfiguration =
+        name: host:
+        nixpkgs.lib.nixosSystem {
+          system = host.system;
+          modules = host.modules ++ [
+            host.path
             inputs.agenix.nixosModules.default
             inputs.secrets.nixosModules.default
             home-manager.nixosModules.home-manager
           ];
           specialArgs = mkSpecialArgs {
-            username = "khorer";
-            hostname = "nixos";
-            system = linuxSystem;
+            hostName = name;
+            username = host.username;
+            system = host.system;
           };
         };
-      };
 
-      # Darwin configurations
-      darwinConfigurations = {
-        "macix" = darwin.lib.darwinSystem {
-          system = darwinSystem;
-          modules = [
-            ./hosts/macix
+      mkDarwinConfiguration =
+        name: host:
+        darwin.lib.darwinSystem {
+          system = host.system;
+          modules = host.modules ++ [
+            host.path
             inputs.agenix.darwinModules.default
             inputs.secrets.darwinModules.default
             home-manager.darwinModules.home-manager
           ];
           specialArgs = mkSpecialArgs {
-            username = "khrore";
-            hostname = "macix";
-            system = darwinSystem;
+            hostName = name;
+            username = host.username;
+            system = host.system;
           };
         };
+
+      hosts = {
+        dev-4 = {
+          kind = "nixos";
+          system = "x86_64-linux";
+          username = "khrore";
+          path = ./hosts/dev-4;
+          modules = [ inputs.disko.nixosModules.disko ];
+        };
+
+        nixos = {
+          kind = "nixos";
+          system = "x86_64-linux";
+          username = "khorer";
+          path = ./hosts/nixos;
+          modules = [ inputs.disko.nixosModules.disko ];
+        };
+
+        macix = {
+          kind = "darwin";
+          system = "aarch64-darwin";
+          username = "khrore";
+          path = ./hosts/macix;
+          modules = [ ];
+        };
       };
+
+      nixosHosts = nixpkgs.lib.filterAttrs (_: host: host.kind == "nixos") hosts;
+      darwinHosts = nixpkgs.lib.filterAttrs (_: host: host.kind == "darwin") hosts;
+    in
+    {
+      nixosConfigurations = nixpkgs.lib.mapAttrs mkNixosConfiguration nixosHosts;
+      darwinConfigurations = nixpkgs.lib.mapAttrs mkDarwinConfiguration darwinHosts;
     };
 }

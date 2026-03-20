@@ -1,10 +1,4 @@
-{
-  lib,
-  pkgs-unstable,
-  mylib,
-  system,
-  ...
-}:
+{ pkgs-unstable, ... }:
 {
   programs = {
     zsh.enable = true;

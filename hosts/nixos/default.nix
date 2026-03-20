@@ -1,4 +1,8 @@
-{ mylib, ... }:
 {
-  imports = mylib.scanPaths ./. ++ [ ../common/default.nix ];
+  imports = [
+    ../common/default.nix
+    ./disko.nix
+    ./hardware-configuration.nix
+    ./nixpkgs-config.nix
+  ];
 }

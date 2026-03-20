@@ -2,59 +2,37 @@
   lib,
   mylib,
   username,
-  hostname,
   pkgs-unstable,
-  shell,
   system,
   inputs,
   stateVersion,
   ...
 }:
-lib.mkMerge [
-  # NixOS user creation (Linux only)
-  (lib.optionalAttrs (mylib.isLinux system) {
-    users = {
-      defaultUserShell = pkgs-unstable.${shell};
-      users.${username} = {
-        isNormalUser = true;
-        extraGroups = [
-          "wheel"
-          "networkmanager"
-          "docker"
-        ];
-      };
+{
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+
+    extraSpecialArgs = {
+      inherit
+        pkgs-unstable
+        inputs
+        username
+        mylib
+        system
+        ;
     };
-  })
 
-  # Home-manager configuration (all platforms)
-  {
-    home-manager = {
-      useGlobalPkgs = true;
-      useUserPackages = true;
-
-      extraSpecialArgs = {
-        inherit
-          pkgs-unstable
-          inputs
-          username
-          hostname
-          shell
-          mylib
-          system
-          ;
+    users.${username} = {
+      home = {
+        inherit stateVersion;
+        inherit username;
+        homeDirectory = if mylib.isDarwin system then "/Users/${username}" else "/home/${username}";
       };
 
-      users.${username} = {
-        home = {
-          inherit stateVersion;
-          inherit username;
-          homeDirectory = if mylib.isDarwin system then "/Users/${username}" else "/home/${username}";
-        };
+      imports = mylib.scanPaths ./pkgs ++ [ ./link-dotfiles.nix ];
 
-        imports = mylib.scanPaths ./pkgs ++ [ ./link-dotfiles.nix ];
-
-        programs.home-manager.enable = true;
-      };
+      programs.home-manager.enable = true;
     };
-  }
-]
+  };
+}
