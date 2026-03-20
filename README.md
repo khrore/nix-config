@@ -1,4 +1,4 @@
-# nixos
+# NixConfig
 
 Personal multi-host Nix flake for Linux and macOS. It uses Nix for system-level state and package installation, while keeping dotfiles linkable as a separate user-level layer instead of tightly coupling them to Home Manager.
 
@@ -67,10 +67,10 @@ Highlights:
 Composition flow:
 
 1. `flake.nix` selects a host.
-2. The host imports `hosts/common/default.nix`.
-3. `hosts/common/default.nix` imports shared system modules and `home/default.nix`.
-4. `home/default.nix` imports all package bundles and the `link-dotfiles` helper definition from `home/link-dotfiles.nix`.
-5. Dotfiles are linked from `dotfiles/common` and the active platform directory when activation runs or when `link-dotfiles` is called manually.
+1. The host imports `hosts/common/default.nix`.
+1. `hosts/common/default.nix` imports shared system modules and `home/default.nix`.
+1. `home/default.nix` imports all package bundles and the `link-dotfiles` helper definition from `home/link-dotfiles.nix`.
+1. Dotfiles are linked from `dotfiles/common` and the active platform directory when activation runs or when `link-dotfiles` is called manually.
 
 ## Using This In Your Own Environment
 
@@ -79,12 +79,12 @@ This repo is personal, so using it unchanged on another machine will usually fai
 Recommended path:
 
 1. Fork or copy the repository.
-2. Update the host map in [flake.nix](/Users/khrore/nixos/flake.nix) with your own host name, username, and target system.
-3. Remove or replace the private `secrets` input if you do not have access to `git@github.com/khrore/nixrets.git`.
-4. Replace Linux hardware files and `disko` definitions under your host directory.
-5. Review shared modules in [hosts/common](/Users/khrore/nixos/hosts/common) and disable anything you do not want globally, especially Hyprland, Docker, `localsend`, `throne`, SSH, and age secret paths.
-6. Trim or replace package bundles in [home/pkgs](/Users/khrore/nixos/home/pkgs) to match your workload.
-7. Add or replace files in [dotfiles](/Users/khrore/nixos/dotfiles) with your own configs.
+1. Update the host map in [flake.nix](/Users/khrore/nixos/flake.nix) with your own host name, username, and target system.
+1. Remove or replace the private `secrets` input if you do not have access to `git@github.com/khrore/nixrets.git`.
+1. Replace Linux hardware files and `disko` definitions under your host directory.
+1. Review shared modules in [hosts/common](/Users/khrore/nixos/hosts/common) and disable anything you do not want globally, especially Hyprland, Docker, `localsend`, `throne`, SSH, and age secret paths.
+1. Trim or replace package bundles in [home/pkgs](/Users/khrore/nixos/home/pkgs) to match your workload.
+1. Add or replace files in [dotfiles](/Users/khrore/nixos/dotfiles) with your own configs.
 
 ## Bootstrap Commands
 
