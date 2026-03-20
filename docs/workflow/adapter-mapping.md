@@ -67,3 +67,4 @@
 | max cycles | workflow config override | workflow config override | workflow config override |
 | escalation | `escalation_policy` in payload | same | same |
 | hidden orchestrator | `hidden: true` | internal-only marker | hidden/internal config |
+| language standards | shared `standards_profile` payload + shared standards references | same | same |

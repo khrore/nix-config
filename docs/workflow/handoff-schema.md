@@ -22,6 +22,12 @@ This schema is runtime-neutral and shared by all adapters.
 - `external_calls`
 - `trust_notes`
 
+`standards_profile` is an optional global field in the shared schema and is required for Rust-routed tasks in v1.
+
+## Optional Global Fields
+
+- `standards_profile`
+
 ## `skip` Object
 
 - `applied` (boolean)
@@ -37,6 +43,14 @@ This schema is runtime-neutral and shared by all adapters.
 - `question_for_human` (string)
 - `blocking` (boolean)
 
+## `standards_profile` Object
+
+- `language` (string)
+- `profile_name` (string)
+- `applied_rules` (array of strings)
+- `repo_overrides` (array of strings)
+- `deviations_allowed` (array of strings)
+
 ## Stage Specific Required Fields
 
 - analyzer:
@@ -45,10 +59,12 @@ This schema is runtime-neutral and shared by all adapters.
 - researcher:
   - `code_map`
   - `existing_patterns`
+  - include `standards_profile` recommendations when the task is language-routed
 - planner:
   - `execution_plan`
   - `validation_plan`
   - `agent_selection`
+  - include bound `standards_profile` when the selected agent is language-specific
 - coder:
   - `change_log`
   - `implementation_notes`
@@ -93,6 +109,13 @@ Each item must include:
   "open_questions": [],
   "next_agent": "typescript-coder",
   "review_cycle_count": 1,
+  "standards_profile": {
+    "language": "typescript",
+    "profile_name": "service-default",
+    "applied_rules": [],
+    "repo_overrides": [],
+    "deviations_allowed": []
+  },
   "review_outcome": "changes_required",
   "fix_instructions": [
     {

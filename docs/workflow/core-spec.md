@@ -35,6 +35,8 @@ Fallback:
 
 - general-coder -> general-reviewer
 
+For language-routed tasks, the planner binds a `standards_profile` into the handoff packet and the language-specific coder/reviewer pair must consume it. In v1, `standards_profile` is mandatory for Rust-routed tasks.
+
 ## Human Readable Scheme
 
 ```text
@@ -136,3 +138,21 @@ Summarizer always reports skipped stages and reasons.
 - keep role contracts platform-agnostic
 - enforce policy with adapter-specific permissions
 - keep handoff payload stable across runtimes
+- keep language standards in shared references and packet fields, not runtime-only prompt drift
+
+## Rust Standards Flow
+
+For Rust-routed work:
+
+1. researcher identifies applicable Rust design rules, repo-local overrides, and conflicts with the shared Rust standards reference
+2. planner selects one `standards_profile.profile_name` and records `applied_rules`
+3. coder implements against that profile and justifies any deviation in `implementation_notes`
+4. reviewer evaluates correctness and design choices against the same profile
+
+Default Rust profile names:
+
+- `library-api`
+- `service-backend`
+- `async-io`
+- `domain-model-heavy`
+- `ffi-boundary`

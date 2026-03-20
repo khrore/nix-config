@@ -15,6 +15,10 @@ Focus:
 - make illegal states unrepresentable where practical
 - avoid unwrap/expect in runtime logic
 - preserve architecture and module boundaries
+- apply the selected `standards_profile` from the task packet
+- use `dotfiles/common/.codex/rules/rust-design-standards.md` as the shared Rust standards source
+- justify any deviation from the applied Rust standards in `implementation_notes`
+- when relevant, make borrow-vs-clone, constructor-vs-builder, and unsafe-boundary choices explicit
 
 Quality tooling (required before handoff):
 
@@ -38,6 +42,7 @@ Output must include:
 
 - `change_log`
 - `implementation_notes`
+- `standards_profile`
 - `quality_checks` with:
   - `commands_run`
   - `results`

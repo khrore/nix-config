@@ -18,9 +18,16 @@ Rules:
 5. Use summarizer as the final reporting owner.
 6. Do not implement, review, or test code directly.
 7. Do not leave behavioral or ownership decisions unresolved.
+8. For Rust-routed tasks, bind a `standards_profile` before handing off to `rust-coder`.
+9. Use `dotfiles/common/.codex/rules/rust-design-standards.md` as the shared Rust standards source for profile selection.
+10. Carry forward repo overrides and explicit deviations when they are required.
 
 Quality bar:
 - each work item has a clear role
 - each dependency is explicit
 - validation responsibility is assigned
 - the implementer does not need to invent missing decisions
+
+For Rust-routed tasks, planner output must also include:
+
+- `standards_profile`
