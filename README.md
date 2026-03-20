@@ -1,4 +1,4 @@
-# NixConfig
+# Nix Config
 
 Personal multi-host Nix flake for Linux and macOS. It uses Nix for system-level state and package installation, while keeping dotfiles linkable as a separate user-level layer instead of tightly coupling them to Home Manager.
 
