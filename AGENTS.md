@@ -4,8 +4,8 @@ This file captures repository-specific structure and intent so coding agents can
 
 ## Purpose
 
-- Repository type: multi-host Nix flake covering NixOS and `nix-darwin`, with Home Manager shared across both.
-- Main goal: keep host definitions small and composable while centralizing reusable packages, dotfiles, and platform-specific modules.
+- Repository type: multi-host Nix flake covering NixOS and `nix-darwin`, with Home Manager used mainly as a package layer on top of shared system modules.
+- Main goal: keep host definitions small and composable while centralizing reusable packages, root-level system behavior, dotfiles, and platform-specific modules.
 - Primary use cases: workstation bootstrap, developer tool installation, desktop setup, shell/editor environment, and portable multiagent workflow configuration.
 - Change priority: preserve evaluation stability first, then host portability, then ergonomics.
 
@@ -94,6 +94,7 @@ Darwin-specific behavior:
 - Uses global packages and user packages.
 - Imports all `home/pkgs/*.nix` bundles plus `home/link-dotfiles.nix`.
 - Enables `programs.home-manager.enable`.
+- In practice this layer is primarily used to install user packages and expose the `link-dotfiles` helper; dotfile linking can also be run manually outside a full Home Manager switch.
 
 Package bundles are grouped by concern:
 
@@ -116,6 +117,7 @@ This repo is optimized for:
 
 - Dotfiles live under `dotfiles/common`, `dotfiles/nixos`, and `dotfiles/darwin`.
 - `home/link-dotfiles.nix` generates a `link-dotfiles` helper and a Home Manager activation hook.
+- `link-dotfiles` is user-invokable at any time; do not assume dotfile changes require a Home Manager rebuild.
 - Dotfiles are discovered at runtime from:
   - `$NIXOS_CONFIG_ROOT`
   - `$HOME/nixos`

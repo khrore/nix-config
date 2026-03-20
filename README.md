@@ -1,6 +1,6 @@
 # nixos
 
-Personal multi-host Nix flake for Linux and macOS. It combines `nixpkgs`, `nix-darwin`, Home Manager, `agenix`, host-specific modules, and a shared dotfiles layer to provision a full workstation rather than a single machine profile.
+Personal multi-host Nix flake for Linux and macOS. It uses Nix for system-level state and package installation, while keeping dotfiles linkable as a separate user-level layer instead of tightly coupling them to Home Manager.
 
 ## What This Repo Defines
 
@@ -20,7 +20,7 @@ This config is built around:
 
 - `nixpkgs` and `nixpkgs-unstable` for packages
 - `nix-darwin` for macOS system management
-- Home Manager for user-level packages and dotfiles
+- Home Manager mainly for user-level package installation
 - `disko` for Linux disk layout
 - `agenix` plus a private `secrets` flake for secret material
 - Homebrew on macOS for native apps that are better managed outside Nix
@@ -38,7 +38,8 @@ The helper library in [lib/default.nix](/Users/khrore/nixos/lib/default.nix) pro
 - Install a development environment with shells, editors, formatters, linters, and language servers
 - Configure a Linux desktop around Hyprland and Wayland tools
 - Configure a macOS machine with `nix-darwin` defaults and Homebrew apps
-- Link shared dotfiles into `$HOME`
+- Install packages and root-related system configuration
+- Link shared dotfiles into `$HOME` independently
 - Provide AI and agent tooling such as `opencode`, `qwen-code`, and workflow runtime files
 
 ## Tooling Included
@@ -68,8 +69,8 @@ Composition flow:
 1. `flake.nix` selects a host.
 2. The host imports `hosts/common/default.nix`.
 3. `hosts/common/default.nix` imports shared system modules and `home/default.nix`.
-4. `home/default.nix` imports all package bundles and `home/link-dotfiles.nix`.
-5. Dotfiles are linked from `dotfiles/common` and the active platform directory.
+4. `home/default.nix` imports all package bundles and the `link-dotfiles` helper definition from `home/link-dotfiles.nix`.
+5. Dotfiles are linked from `dotfiles/common` and the active platform directory when activation runs or when `link-dotfiles` is called manually.
 
 ## Using This In Your Own Environment
 
@@ -109,7 +110,9 @@ The Darwin host in this repo also enables Homebrew integration, so the initial a
 
 ## Dotfiles Behavior
 
-Dotfiles are linked by Home Manager via [home/link-dotfiles.nix](/Users/khrore/nixos/home/link-dotfiles.nix). At activation time the script searches for the repo in:
+[home/link-dotfiles.nix](/Users/khrore/nixos/home/link-dotfiles.nix) installs a `link-dotfiles` command and also hooks it into Home Manager activation. The dotfiles are not tightly coupled to Home Manager after that point: you can run `link-dotfiles` manually at any time to relink configs without reapplying the full Nix configuration.
+
+At runtime the script searches for the repo in:
 
 - `$NIXOS_CONFIG_ROOT`
 - `$HOME/nixos`
@@ -117,6 +120,12 @@ Dotfiles are linked by Home Manager via [home/link-dotfiles.nix](/Users/khrore/n
 - or a nearby checkout under `$HOME`
 
 Platform-specific files override `dotfiles/common` by relative path. Existing non-symlink files in `$HOME` are left in place and reported as warnings.
+
+Manual usage:
+
+```bash
+link-dotfiles
+```
 
 ## Validation
 
