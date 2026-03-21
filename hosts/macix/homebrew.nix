@@ -12,7 +12,8 @@
     # CLI tools not available or better via Homebrew
     brews = [
       # Add any Mac-specific brews here if needed
-      "nushell"
+      "orbstack"
+      "codex"
     ];
 
     # GUI applications
@@ -26,8 +27,6 @@
       "nikitabobko/tap/aerospace"
       "zed"
       "ghostty"
-      "codex"
-      "codex-app"
       "anydesk"
       "chatgpt-atlas"
       "ungoogled-chromium"
