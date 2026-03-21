@@ -63,9 +63,7 @@
           config = nixpkgsConfig;
         };
 
-      mkPkgsUnstable =
-        system:
-        mkPkgsFor inputs.nixpkgs-unstable system;
+      mkPkgsUnstable = system: mkPkgsFor inputs.nixpkgs-unstable system;
 
       # importing library
       mylib = import ./lib/default.nix { inherit (nixpkgs) lib; };
@@ -149,7 +147,7 @@
         nixos = {
           kind = "nixos";
           system = "x86_64-linux";
-          username = "khorer";
+          username = "khrore";
           path = ./hosts/nixos;
           modules = [ inputs.disko.nixosModules.disko ];
         };
