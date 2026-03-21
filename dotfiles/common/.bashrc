@@ -47,7 +47,7 @@ function y() {
   rm -f -- "$tmp"
 }
 
-export PATH="/opt/homebrew/bin:~/.cargo/bin:$PATH"
+export PATH="/opt/homebrew/bin:~/.cargo/bin:$HOME/.npm-global/bin:$PATH"
 
 export EDITOR="nvim"
 
