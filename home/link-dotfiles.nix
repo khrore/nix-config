@@ -70,9 +70,10 @@ let
     }
 
     link_dotfiles_runtime() {
-      local repo_root dotfiles_root common_dir platform_dir
-      local rel subdir source target prefix
+      local repo_root dotfiles_root common_dir platform_dir omarchy_config_dir
+      local rel source target prefix source_dir target_prefix target_rel layer
       declare -A sources=()
+      local -a layers=()
 
       repo_root="$(find_repo_root || true)"
       if [ -z "$repo_root" ]; then
@@ -83,41 +84,53 @@ let
       dotfiles_root="$repo_root/dotfiles"
       common_dir="$dotfiles_root/common"
       platform_dir="$dotfiles_root/${platform}"
+      omarchy_config_dir="$repo_root/omarchy/config"
+
+      if [ "${platform}" = "nixos" ] && [ -d "$omarchy_config_dir" ]; then
+        layers+=("$omarchy_config_dir:.config")
+      fi
 
       if [ -d "$common_dir" ]; then
-        while IFS= read -r -d "" file; do
-          prefix="$common_dir/"
-          rel="''${file#"$prefix"}"
-          sources["$rel"]="common"
-        done < <(find "$common_dir" -type f ! -name ".gitkeep" -print0)
+        layers+=("$common_dir:")
       fi
 
       if [ -d "$platform_dir" ]; then
-        while IFS= read -r -d "" file; do
-          prefix="$platform_dir/"
-          rel="''${file#"$prefix"}"
-          sources["$rel"]="${platform}"
-        done < <(find "$platform_dir" -type f ! -name ".gitkeep" -print0)
+        layers+=("$platform_dir:")
       fi
 
-      if [ "''${#sources[@]}" -eq 0 ]; then
+      if [ "''${#layers[@]}" -eq 0 ]; then
         echo "No dotfiles found to link."
         return 0
       fi
 
+      for layer in "''${layers[@]}"; do
+        source_dir="''${layer%%:*}"
+        target_prefix="''${layer#*:}"
+
+        while IFS= read -r -d "" file; do
+          prefix="$source_dir/"
+          rel="''${file#"$prefix"}"
+          if [ -n "$target_prefix" ]; then
+            target_rel="$target_prefix/$rel"
+          else
+            target_rel="$rel"
+          fi
+          sources["$target_rel"]="$file"
+        done < <(find "$source_dir" -type f ! -name ".gitkeep" -print0)
+      done
+
       echo "Processing ''${#sources[@]} dotfile entries from $repo_root..."
 
-      while IFS= read -r rel; do
-        subdir="''${sources["$rel"]}"
-        source="$dotfiles_root/$subdir/$rel"
-        target="$HOME/$rel"
+      while IFS= read -r target_rel; do
+        source="''${sources["$target_rel"]}"
+        target="$HOME/$target_rel"
 
         mkdir -p "$(dirname "$target")"
         if [ -e "$target" ] && [ ! -L "$target" ]; then
           echo "Warning: $target exists and is not a symlink, skipping..."
         else
           ln -snf "$source" "$target"
-          echo "✓ Linked $rel"
+          echo "✓ Linked $target_rel"
         fi
       done < <(printf '%s\n' "''${!sources[@]}" | LC_ALL=C sort)
     }
