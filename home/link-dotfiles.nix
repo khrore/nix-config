@@ -71,7 +71,7 @@ let
 
     link_dotfiles_runtime() {
       local repo_root dotfiles_root common_dir platform_dir omarchy_config_dir
-      local rel source target prefix source_dir target_prefix target_rel layer
+      local rel source target prefix source_dir target_prefix target_rel layer stale_link
       declare -A sources=()
       local -a layers=()
 
@@ -133,6 +133,16 @@ let
           echo "✓ Linked $target_rel"
         fi
       done < <(printf '%s\n' "''${!sources[@]}" | LC_ALL=C sort)
+
+      while IFS= read -r stale_link; do
+        source="$(readlink "$stale_link" 2>/dev/null || true)"
+        case "$source" in
+          "$repo_root"/dotfiles/*|"$repo_root"/omarchy/config/*)
+            rm -f "$stale_link"
+            echo "✓ Removed stale link ''${stale_link#$HOME/}"
+            ;;
+        esac
+      done < <(find "$HOME" -xtype l 2>/dev/null)
     }
   '';
 

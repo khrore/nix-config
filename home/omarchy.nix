@@ -2,6 +2,7 @@
   config,
   lib,
   mylib,
+  pkgs,
   system,
   ...
 }:
@@ -9,6 +10,7 @@ let
   isLinux = mylib.isLinux system;
   homeDir = config.home.homeDirectory;
   defaultTheme = "tokyo-night";
+  bashPath = lib.getExe pkgs.bash;
 
   repoDiscovery = ''
     find_repo_root_from_dir() {
@@ -60,27 +62,52 @@ let
 in
 lib.mkIf isLinux {
   home.sessionVariables.OMARCHY_PATH = "${homeDir}/.local/share/omarchy";
-  home.sessionPath = [ "${homeDir}/.local/share/omarchy/bin" ];
+  home.sessionPath = [
+    "${homeDir}/.local/share/omarchy-wrappers/bin"
+    "${homeDir}/.local/share/omarchy/bin"
+  ];
 
   home.activation.linkOmarchyBase = {
     after = [ "linkGeneration" ];
     before = [ "linkDotfiles" ];
     data = ''
-      ${repoDiscovery}
+            ${repoDiscovery}
 
-      repo_root="$(find_repo_root || true)"
-      if [ -z "$repo_root" ] || [ ! -d "$repo_root/omarchy" ]; then
-        echo "Omarchy submodule not found, skipping Omarchy base link."
-      else
-        mkdir -p "$HOME/.local/share"
-        ln -snf "$repo_root/omarchy" "$HOME/.local/share/omarchy"
+            repo_root="$(find_repo_root || true)"
+            if [ -z "$repo_root" ] || [ ! -d "$repo_root/omarchy" ]; then
+              echo "Omarchy submodule not found, skipping Omarchy base link."
+            else
+              mkdir -p "$HOME/.local/share"
 
-        mkdir -p \
-          "$HOME/.config/omarchy/current" \
-          "$HOME/.config/omarchy/themes" \
-          "$HOME/.config/omarchy/themed" \
-          "$HOME/.local/state/omarchy"
-      fi
+              if [ -e "$HOME/.local/share/omarchy" ] && [ ! -L "$HOME/.local/share/omarchy" ]; then
+                backup_path="$HOME/.local/share/omarchy.pre-link-backup"
+                rm -rf "$backup_path"
+                mv "$HOME/.local/share/omarchy" "$backup_path"
+              fi
+
+              ln -snf "$repo_root/omarchy" "$HOME/.local/share/omarchy"
+
+              mkdir -p "$HOME/.local/bin"
+              mkdir -p "$HOME/.local/share/omarchy-wrappers/bin"
+              find "$HOME/.local/share/omarchy-wrappers/bin" -mindepth 1 -maxdepth 1 -type f -delete
+              while IFS= read -r script; do
+                name="$(basename "$script")"
+                cat >"$HOME/.local/share/omarchy-wrappers/bin/$name" <<'EOF'
+      #!${bashPath}
+      exec ${bashPath} "$HOME/.local/share/omarchy/bin/$(basename "$0")" "$@"
+      EOF
+                chmod +x "$HOME/.local/share/omarchy-wrappers/bin/$name"
+                if [ ! -e "$HOME/.local/bin/$name" ] || [ -L "$HOME/.local/bin/$name" ]; then
+                  ln -snf "$HOME/.local/share/omarchy-wrappers/bin/$name" "$HOME/.local/bin/$name"
+                fi
+              done < <(find "$repo_root/omarchy/bin" -maxdepth 1 -type f | LC_ALL=C sort)
+
+              mkdir -p \
+                "$HOME/.config/omarchy/current" \
+                "$HOME/.config/omarchy/themes" \
+                "$HOME/.config/omarchy/themed" \
+                "$HOME/.local/state/omarchy"
+            fi
     '';
   };
 

@@ -14,7 +14,7 @@ let
     pkgs-unstable.fastfetch
     pkgs-unstable.fcitx5
     pkgs-unstable.fcitx5-gtk
-    pkgs-unstable.fcitx5-qt
+    pkgs-unstable.libsForQt5.fcitx5-qt
     pkgs-unstable.gpu-screen-recorder
     pkgs-unstable.grim
     pkgs-unstable.hyprsunset
@@ -33,7 +33,6 @@ let
     pkgs-unstable.xdg-terminal-exec
 
     # Omarchy workflow tools referenced by bindings and helpers
-    pkgs-unstable.chromium
     pkgs-unstable.imv
     pkgs-unstable.lazydocker
     pkgs-unstable.lazygit
