@@ -12,8 +12,6 @@
     # CLI tools not available or better via Homebrew
     brews = [
       # Add any Mac-specific brews here if needed
-      "orbstack"
-      "codex"
     ];
 
     # GUI applications
@@ -25,6 +23,7 @@
       "zen@twilight"
       "docker-desktop"
       "asmvik/formulae/yabai"
+      "codex"
       "zed"
       "ghostty"
       "anydesk"
