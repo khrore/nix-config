@@ -8,73 +8,72 @@
 }:
 let
   # Linux-specific utilities
-  linuxUtils = lib.optionals (mylib.isLinux system) [
-    # Wayland-specific
-    pkgs-unstable.cliphist
-    pkgs-unstable.grimblast
-    pkgs-unstable.wl-clipboard
-    pkgs-unstable.showmethekey
-    pkgs-unstable.wtype
+  linuxUtils =
+    with pkgs-unstable;
+    lib.optionals (mylib.isLinux system) [
+      # Wayland-specific
+      cliphist
+      grimblast
+      wl-clipboard
+      showmethekey
+      wtype
 
-    # Linux-specific tools pkgs-unstable.brightnessctl
-    pkgs-unstable.playerctl
-    pkgs-unstable.libsForQt5.qt5ct
-    pkgs-unstable.libsForQt5.qt5.qtwayland
-    pkgs-unstable.libxkbcommon
-    pkgs-unstable.rofimoji
-    pkgs-unstable.nwg-look
-    pkgs-unstable.alsa-lib
-    pkgs-unstable.catppuccin-cursors.mochaDark
-  ];
+      # Linux-specific tools pkgs-unstable.brightnessctl
+      playerctl
+      libsForQt5.qt5ct
+      libsForQt5.qt5.qtwayland
+      libxkbcommon
+      rofimoji
+      nwg-look
+      alsa-lib
+      catppuccin-cursors.mochaDark
+    ];
 
   # Cross-platform utilities
-  sharedUtils = [
+  sharedUtils = with pkgs-unstable; [
     # Git
-    pkgs-unstable.git
-    pkgs-unstable.gh
+    git
+    gh
 
     # Media tools
-    pkgs-unstable.ffmpeg
+    ffmpeg
 
     # CLI utilities
-    pkgs-unstable.nh
-    # pkgs-unstable.yt-dlp
-    pkgs-unstable.file
-    pkgs-unstable.jd-diff-patch
-    pkgs-unstable.libnotify
-    pkgs-unstable.jq
+    nh
+    yt-dlp
+    file
+    libnotify
+    jq
 
     # Networking
-    pkgs-unstable.sing-box
-    pkgs-unstable.wget
-    pkgs-unstable.mtr
-    pkgs-unstable.iperf3
-    pkgs-unstable.socat
-    pkgs-unstable.nmap
-    pkgs-unstable.ipcalc
-    pkgs-unstable.openssl
-    pkgs-unstable.prettyping
-
-    # Filesystem
-    pkgs-unstable.fuse
-    pkgs-unstable.smbclient-ng
+    sing-box
+    wget
+    mtr
+    iperf3
+    socat
+    nmap
+    ipcalc
+    openssl
+    prettyping
 
     # Encription
-    pkgs-unstable.gnupg
+    gnupg
 
     # Archives
-    pkgs-unstable.zip
-    pkgs-unstable.unzip
-    pkgs-unstable.xz
-    pkgs-unstable.p7zip
+    zip
+    unzip
+    xz
+    p7zip
 
     # Docs
-    pkgs-unstable.pandoc
-    pkgs-unstable.texliveSmall
+    pandoc
+    texliveSmall
 
+  ];
+  flakeUtils = [
     inputs.agenix.packages.${system}.default
   ];
 in
 {
-  home.packages = sharedUtils ++ linuxUtils;
+  home.packages = sharedUtils ++ linuxUtils ++ flakeUtils;
 }

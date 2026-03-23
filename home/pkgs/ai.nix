@@ -7,9 +7,6 @@
     # Qwen
     qwen-code
 
-    # Microsoft
-    github-copilot-cli
-
     # Open source
     opencode
     promptfoo

@@ -24,7 +24,7 @@
       "localsend"
       "zen@twilight"
       "docker-desktop"
-      "nikitabobko/tap/aerospace"
+      "asmvik/formulae/yabai"
       "zed"
       "ghostty"
       "anydesk"
