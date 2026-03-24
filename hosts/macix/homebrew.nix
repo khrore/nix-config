@@ -12,6 +12,7 @@
     # CLI tools not available or better via Homebrew
     brews = [
       # Add any Mac-specific brews here if needed
+      # "asmvik/formulae/yabai"
     ];
 
     # GUI applications
@@ -22,13 +23,13 @@
       "localsend"
       "zen@twilight"
       "docker-desktop"
-      "asmvik/formulae/yabai"
       "codex"
       "zed"
       "ghostty"
       "anydesk"
       "chatgpt-atlas"
       "ungoogled-chromium"
+      "nikitabobko/tap/aerospace"
     ];
 
     # Mac App Store apps (requires mas-cli)

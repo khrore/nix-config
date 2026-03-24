@@ -10,5 +10,8 @@
     # Open source
     opencode
     promptfoo
+
+    # Python
+    uv
   ];
 }
