@@ -165,5 +165,6 @@ If commands are unavailable or blocked by missing private inputs, report that ex
 - Keep changes scoped; avoid unrelated host churn.
 - Preserve Linux/Darwin guards.
 - Prefer shared modules only for genuinely cross-host behavior.
+- Do not hardcode variables or environment-specific values in code; when such values are required, move them into the relevant app configuration and reference them from there.
 - Do not commit secrets, decrypted payloads, or machine-local tokens.
 - Stop if touched files changed unexpectedly outside the current task.
