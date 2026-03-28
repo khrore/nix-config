@@ -30,6 +30,7 @@ in
       yazi
       neovim
       zellij
+      lazygit
 
       # disk
       ncdu
