@@ -29,6 +29,7 @@ in
     [
       yazi
       neovim
+      zellij
 
       # disk
       ncdu
