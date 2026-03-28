@@ -18,7 +18,8 @@ let
       showmethekey
       wtype
 
-      # Linux-specific tools pkgs-unstable.brightnessctl
+      # Linux-specific tools
+      brightnessctl
       playerctl
       libsForQt5.qt5ct
       libsForQt5.qt5.qtwayland

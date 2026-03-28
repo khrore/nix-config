@@ -30,7 +30,9 @@
         homeDirectory = if mylib.isDarwin system then "/Users/${username}" else "/home/${username}";
       };
 
-      imports = mylib.scanPaths ./pkgs ++ [ ./link-dotfiles.nix ];
+      imports = mylib.scanPaths ./pkgs ++ [
+        ./link-dotfiles.nix
+      ];
 
       programs.home-manager.enable = true;
     };

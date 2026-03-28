@@ -1,0 +1,3 @@
+#!/bin/bash
+
+echo $(git -C "$HOME/.local/share/linux-desktop" rev-parse --abbrev-ref HEAD)
