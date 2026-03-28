@@ -11,6 +11,7 @@ application/x-extension-xhtml=zen-twilight.desktop;zen-beta.desktop;
 application/x-extension-xht=zen-twilight.desktop;zen-beta.desktop;
 x-scheme-handler/tg=org.telegram.desktop.desktop;
 x-scheme-handler/tonsite=org.telegram.desktop.desktop;
+x-scheme-handler/discord=vesktop.desktop
 
 [Added Associations]
 x-scheme-handler/http=zen-beta.desktop;zen-twilight.desktop;

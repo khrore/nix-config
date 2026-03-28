@@ -31,6 +31,7 @@ in
       neovim
       zellij
       lazygit
+      lazydocker
 
       # disk
       ncdu

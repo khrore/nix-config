@@ -17,6 +17,7 @@ let
       wl-clipboard
       showmethekey
       wtype
+      nftables
 
       # Linux-specific tools
       brightnessctl

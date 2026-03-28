@@ -35,6 +35,7 @@ let
       # Browser
       ungoogled-chromium
       tor
+      vesktop
     ];
 
   linuxFlakePkgs = lib.optionals (mylib.isLinux system) [
