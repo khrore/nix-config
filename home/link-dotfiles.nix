@@ -70,7 +70,7 @@ let
     }
 
     link_dotfiles_runtime() {
-      local repo_root dotfiles_root common_dir platform_dir omarchy_config_dir
+      local repo_root dotfiles_root common_dir platform_dir
       local rel source target prefix source_dir target_prefix target_rel layer stale_link
       declare -A sources=()
       local -a layers=()
@@ -84,11 +84,6 @@ let
       dotfiles_root="$repo_root/dotfiles"
       common_dir="$dotfiles_root/common"
       platform_dir="$dotfiles_root/${platform}"
-      omarchy_config_dir="$repo_root/omarchy/config"
-
-      if [ "${platform}" = "nixos" ] && [ -d "$omarchy_config_dir" ]; then
-        layers+=("$omarchy_config_dir:.config")
-      fi
 
       if [ -d "$common_dir" ]; then
         layers+=("$common_dir:")

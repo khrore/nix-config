@@ -15,6 +15,7 @@ let
     pkgs-unstable.fcitx5
     pkgs-unstable.fcitx5-gtk
     pkgs-unstable.libsForQt5.fcitx5-qt
+    pkgs-unstable.gum
     pkgs-unstable.gpu-screen-recorder
     pkgs-unstable.grim
     pkgs-unstable.hyprsunset
@@ -31,6 +32,8 @@ let
     pkgs-unstable.walker
     pkgs-unstable.wiremix
     pkgs-unstable.xdg-terminal-exec
+    pkgs-unstable.upower
+    pkgs-unstable.v4l-utils
 
     # Omarchy workflow tools referenced by bindings and helpers
     pkgs-unstable.imv
