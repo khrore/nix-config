@@ -1,12 +1,7 @@
 return {
 	"yetone/avante.nvim",
 	opts = {
-		provider = "opencode",
-		acp_providers = {
-			["opencode"] = {
-				command = "opencode",
-				args = { "acp" },
-			},
-		},
+		provider = "copilot",
+		auto_suggestions_provider = "copilot",
 	},
 }
