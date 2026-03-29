@@ -9,7 +9,7 @@
 let
   isLinux = mylib.isLinux system;
   homeDir = config.home.homeDirectory;
-  defaultTheme = "tokyo-night";
+  defaultTheme = "gruvbox";
   bashPath = lib.getExe pkgs.bash;
 
   repoDiscovery = ''

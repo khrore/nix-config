@@ -7,6 +7,7 @@
   ...
 }:
 let
+  darwinUtils = with pkgs-unstable; lib.optionals (mylib.isDarwin system) [ orbstack ];
   # Linux-specific utilities
   linuxUtils =
     with pkgs-unstable;
@@ -70,14 +71,11 @@ let
     # Docs
     pandoc
     texliveSmall
-
-    # VM
-    orbstack
   ];
   flakeUtils = [
     inputs.agenix.packages.${system}.default
   ];
 in
 {
-  home.packages = sharedUtils ++ linuxUtils ++ flakeUtils;
+  home.packages = sharedUtils ++ linuxUtils ++ darwinUtils ++ flakeUtils;
 }

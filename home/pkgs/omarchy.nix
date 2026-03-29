@@ -3,46 +3,46 @@
   pkgs-unstable,
   mylib,
   system,
+  isDisplay,
   ...
 }:
 let
-  linuxOmarchyPkgs = lib.optionals (mylib.isLinux system) [
-    # Omarchy desktop/runtime layer
-    pkgs-unstable.alacritty
-    pkgs-unstable.bluetui
-    pkgs-unstable.elephant
-    pkgs-unstable.fastfetch
-    pkgs-unstable.fcitx5
-    pkgs-unstable.fcitx5-gtk
-    pkgs-unstable.libsForQt5.fcitx5-qt
-    pkgs-unstable.gum
-    pkgs-unstable.gpu-screen-recorder
-    pkgs-unstable.grim
-    pkgs-unstable.hyprsunset
-    pkgs-unstable.mako
-    pkgs-unstable.mise
-    pkgs-unstable.pamixer
-    pkgs-unstable.polkit_gnome
-    pkgs-unstable.satty
-    pkgs-unstable.signal-desktop
-    pkgs-unstable.slurp
-    pkgs-unstable.swaybg
-    pkgs-unstable.swayosd
-    pkgs-unstable.uwsm
-    pkgs-unstable.walker
-    pkgs-unstable.wiremix
-    pkgs-unstable.xdg-terminal-exec
-    pkgs-unstable.upower
-    pkgs-unstable.v4l-utils
+  linuxOmarchyPkgs =
+    with pkgs-unstable;
+    lib.optionals (mylib.isLinux system && isDisplay) [
+      # Omarchy desktop/runtime layer
+      alacritty
+      bluetui
+      elephant
+      fastfetch
+      fcitx5
+      fcitx5-gtk
+      libsForQt5.fcitx5-qt
+      gum
+      gpu-screen-recorder
+      grim
+      hyprsunset
+      mako
+      mise
+      pamixer
+      polkit_gnome
+      satty
+      signal-desktop
+      slurp
+      swaybg
+      swayosd
+      uwsm
+      walker
+      wiremix
+      xdg-terminal-exec
+      upower
+      v4l-utils
 
-    # Omarchy workflow tools referenced by bindings and helpers
-    pkgs-unstable.imv
-    pkgs-unstable.lazydocker
-    pkgs-unstable.lazygit
-    pkgs-unstable.netcat-openbsd
-    pkgs-unstable.pam_u2f
-    pkgs-unstable.xournalpp
-  ];
+      # Omarchy workflow tools referenced by bindings and helpers
+      netcat-openbsd
+      pam_u2f
+      xournalpp
+    ];
 in
 {
   home.packages = linuxOmarchyPkgs;

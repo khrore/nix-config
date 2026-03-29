@@ -1,11 +1,12 @@
 {
-  lib,
   mylib,
   username,
   pkgs-unstable,
   system,
   inputs,
   stateVersion,
+  isCuda,
+  isDisplay,
   ...
 }:
 {
@@ -20,6 +21,8 @@
         username
         mylib
         system
+        isCuda
+        isDisplay
         ;
     };
 

@@ -84,6 +84,8 @@
           hostName,
           username,
           system,
+          isCuda,
+          isDisplay,
         }:
         {
           inherit
@@ -97,6 +99,8 @@
             mylib
             nixpkgsConfig
             hostName
+            isCuda
+            isDisplay
             ;
           pkgs-unstable = mkPkgsUnstable system;
         };
@@ -115,6 +119,8 @@
             hostName = name;
             username = host.username;
             system = host.system;
+            isCuda = host.isCuda;
+            isDisplay = host.isDisplay;
           };
         };
 
@@ -132,6 +138,8 @@
             hostName = name;
             username = host.username;
             system = host.system;
+            isCuda = host.isCuda;
+            isDisplay = host.isDisplay;
           };
         };
 
@@ -142,6 +150,8 @@
           username = "khrore";
           path = ./hosts/dev-4;
           modules = [ inputs.disko.nixosModules.disko ];
+          isCuda = false;
+          isDisplay = true;
         };
 
         nixos = {
@@ -150,6 +160,18 @@
           username = "khrore";
           path = ./hosts/nixos;
           modules = [ inputs.disko.nixosModules.disko ];
+          isCuda = true;
+          isDisplay = true;
+        };
+
+        vlinix = {
+          kind = "nixos";
+          system = "aarch64-linux";
+          username = "khrore";
+          path = ./hosts/vlinix;
+          modules = [ ];
+          isCuda = false;
+          isDisplay = false;
         };
 
         macix = {
@@ -158,6 +180,8 @@
           username = "khrore";
           path = ./hosts/macix;
           modules = [ ];
+          isCuda = false;
+          isDisplay = true;
         };
       };
 

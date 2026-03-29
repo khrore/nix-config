@@ -1,17 +1,17 @@
 {
   lib,
   inputs,
-  pkgs,
   pkgs-unstable,
   mylib,
   system,
+  isDisplay,
   ...
 }:
 let
   # Linux-specific GUI packages
   linuxPkgs =
     with pkgs-unstable;
-    lib.optionals (mylib.isLinux system) [
+    lib.optionals (mylib.isLinux system && isDisplay) [
       # Wayland/Hyprland tools (Linux only)
       waybar
       dunst
@@ -38,26 +38,28 @@ let
       vesktop
     ];
 
-  linuxFlakePkgs = lib.optionals (mylib.isLinux system) [
+  linuxFlakePkgs = lib.optionals (mylib.isLinux system && isDisplay) [
     inputs.zen-browser.packages."${system}".twilight
   ];
 
   # Cross-platform GUI packages
-  sharedPkgs = with pkgs-unstable; [
-    # Terminals
-    kitty
+  sharedPkgs =
+    with pkgs-unstable;
+    lib.optionals isDisplay [
+      # Terminals
+      kitty
 
-    # Applications
-    obsidian
-    telegram-desktop
-    spotify
-    qbittorrent
-    affine
+      # Applications
+      obsidian
+      telegram-desktop
+      spotify
+      qbittorrent
+      affine
 
-    # DB
-    dbeaver-bin
-    plantuml
-  ];
+      # DB
+      dbeaver-bin
+      plantuml
+    ];
 in
 {
   home.packages = sharedPkgs ++ linuxPkgs ++ linuxFlakePkgs;

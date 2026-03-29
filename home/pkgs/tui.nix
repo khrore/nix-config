@@ -3,39 +3,44 @@
   pkgs-unstable,
   mylib,
   system,
+  isCuda,
   ...
 }:
 let
-  # NVIDIA-specific packages (only for Linux systems with NVIDIA GPU)
+  # CUDA-specific terminal tools
   nvidiaPackages =
     with pkgs-unstable;
-    lib.optionals (mylib.isLinux system) [
+    lib.optionals (mylib.isLinux system && isCuda) [
       btop-cuda
       gpustat
+    ];
+
+  noGpu =
+    with pkgs-unstable;
+    lib.optionals (!isCuda) [
+      btop
+    ];
+
+  linuxPackages =
+    with pkgs-unstable;
+    lib.optionals (mylib.isLinux system) [
       imv
 
       # Moved to brew
       zed-editor
     ];
-  darwin =
-    with pkgs-unstable;
-    lib.optionals (mylib.isDarwin system) [
-      btop
-    ];
+
+  shared = with pkgs-unstable; [
+    yazi
+    neovim
+    zellij
+    lazygit
+    lazydocker
+
+    # disk
+    ncdu
+  ];
 in
 {
-  home.packages =
-    with pkgs-unstable;
-    [
-      yazi
-      neovim
-      zellij
-      lazygit
-      lazydocker
-
-      # disk
-      ncdu
-    ]
-    ++ darwin
-    ++ nvidiaPackages;
+  home.packages = shared ++ linuxPackages ++ noGpu ++ nvidiaPackages;
 }
