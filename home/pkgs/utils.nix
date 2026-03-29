@@ -71,6 +71,8 @@ let
     pandoc
     texliveSmall
 
+    # VM
+    orbstack
   ];
   flakeUtils = [
     inputs.agenix.packages.${system}.default
