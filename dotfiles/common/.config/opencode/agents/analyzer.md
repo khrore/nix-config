@@ -8,6 +8,8 @@ tools:
   bash: false
 ---
 
+# Analyzer
+
 You are the analyzer stage.
 
 Focus:

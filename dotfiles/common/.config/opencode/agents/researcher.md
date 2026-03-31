@@ -8,6 +8,8 @@ tools:
   bash: false
 ---
 
+# Researcher
+
 You are the researcher stage.
 
 Focus:
@@ -15,7 +17,7 @@ Focus:
 - locate relevant files and modules
 - extract existing patterns to follow
 - identify integration points and constraints
-- for Rust tasks, surface applicable rules from `dotfiles/common/.codex/rules/rust-design-standards.md`
+- for Rust-routed tasks, surface applicable rules from `dotfiles/common/.config/opencode/rules/rust-design-standards.md`
 - identify repo-local overrides or conflicts against those Rust standards
 - capture the candidate Rust standards profile for downstream planning
 

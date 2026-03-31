@@ -1,168 +1,103 @@
-# AGENTS.md - Multiagent Workflow Playbook
+# AGENTS.md - OpenCode Policy Kernel
 
-- Audience: Workflow agents under this directory.
-- Purpose: Shared context and quality-of-life conventions for clean handoffs.
-- Scope: Coordination guidance only. Role behavior and routing rules live in each agent file.
+- Audience: all OpenCode threads and spawned agents.
+- Scope: global execution policy, safety invariants, delegation defaults, and reporting requirements.
+- Philosophy: small context, explicit contracts, independent verification, reversible changes.
+- Version: 3.0.0
+- Last Updated: 2026-03-31
 
----
+______________________________________________________________________
 
-## 1) What this file is (and is not)
+## 1. Precedence
 
-Use this file as a lightweight playbook to keep stage outputs consistent and easy to consume.
+Apply instructions in this order:
 
-This file does not replace:
+1. Direct user request
+1. Verified environment and repo reality
+1. This `AGENTS.md`
+1. Role prompts under `~/.config/opencode/agents/`
+1. Workflow contracts and references under repo `docs/workflow/` and `~/.config/opencode/rules/`
+1. Skill instructions loaded for the current task
 
-- `workflow-orchestrator.md` for queue control and loop routing
-- stage prompts (`analyzer`, `researcher`, `planner`, `coder`, `reviewer`, `tester`, `technical-writer`, `summarizer`) for role-specific rules
-- workflow docs in `docs/workflow/` for canonical schema and policy definitions
+If two rules conflict at the same level, choose the safer behavior and record the assumption in the final report.
 
-If there is a conflict, follow the stage prompt and orchestrator context.
+______________________________________________________________________
 
----
+## 2. Global Invariants
 
-## 2) Workflow orientation (quick map)
+These rules apply to every task unless a higher-precedence instruction overrides them.
 
-Default queue:
+1. Inspect before mutation. Read the relevant code, config, or docs before editing.
+1. Keep context small. Load only the global kernel, the active role prompt, and task-relevant references.
+1. Use explicit contracts. Non-trivial delegated work must use schema-valid workflow packets.
+1. Delegate by default. Non-trivial implementation work should use planner/coder/reviewer/tester separation unless a documented exception applies.
+1. Use distinct verification. Coder output is not final until reviewed and tested by a distinct stage.
+1. Make small, reversible changes. Avoid unrelated edits and speculative refactors.
+1. Never silently swallow failures. Errors must say what failed and where.
+1. Never log secrets or raw sensitive payloads.
+1. Never run destructive git commands unless the user explicitly asks.
+1. Stop if unexpected external changes appear in touched files.
 
-`analyzer -> researcher -> planner -> coder -> reviewer -> tester -> technical-writer -> summarizer`
+______________________________________________________________________
 
-Common loop:
+## 3. Execution Contract
 
-- reviewer returns `changes_required`
-- route back to the same coder with actionable `fix_instructions`
-- repeat until approved or review-cycle limit is reached
+Use this default flow for non-trivial work:
 
-Escalation is context-driven via workflow settings (for example `escalation_policy`, `max_review_cycles`).
+1. `workflow-orchestrator` acts as orchestrator.
+1. Orchestrator inspects scope, risk, dependencies, and likely write sets.
+1. Planner produces a schema-valid work plan when decomposition is not trivial.
+1. Orchestrator emits task packets with bounded ownership.
+1. Coder implements within the packet write set.
+1. Reviewer performs an independent defect and regression pass.
+1. Tester runs the validation loop and classifies failures.
+1. Summarizer produces the final user-facing report.
 
----
+Delegation exceptions are allowed only when the task is trivial, no useful sub-agent capability exists, or decomposition would add more risk than value. The final report must state why delegation was skipped.
 
-## 3) Handoff quality defaults
+______________________________________________________________________
 
-Every handoff should be easy for the next stage to execute without guessing.
+## 4. Validation Minimums
 
-- Keep outputs concise and structured; prefer short lists over long prose.
-- State assumptions explicitly; do not hide them in narrative text.
-- Call out unknowns that can change implementation behavior.
-- Include evidence references (files, checks, observations), not just conclusions.
-- If work is skipped, state what was skipped and why.
+For behavior-changing work, validate in this order when applicable:
 
-Recommended status vocabulary (for consistency):
+1. formatter check
+1. linter check
+1. type or LSP-equivalent check
+1. build or compile check
+1. targeted tests for changed behavior
+1. broader tests when risk or scope requires
 
-- `ready`: stage finished and handoff is complete
-- `needs_human`: stage cannot continue without a decision
-- `blocked`: cannot proceed due to missing input/tooling/precondition
-- `changes_required`: reviewer requests coder remediation
-- `done`: terminal completion (typically summarizer)
+Classify failures as one of:
 
----
+- introduced
+- pre-existing
+- environment
+- scope-expanding
 
-## 4) Escalation communication style
+Do not claim success without command evidence.
 
-When asking a human question, keep it decision-ready:
+______________________________________________________________________
 
-1. One clear question
-2. Why this decision matters now
-3. Recommended default
-4. What changes based on each choice
+## 5. Reporting Contract
 
-Avoid broad or multi-part questions that delay routing.
+Every completed task report must include:
 
----
+1. What changed
+1. Why
+1. Validation run with pass/fail status
+1. Residual risk
+1. Assumptions
 
-## 5) Reviewer -> coder remediation quality
+If delegation was skipped or validation was incomplete, say so explicitly.
 
-`fix_instructions` should be actionable and verifiable.
+______________________________________________________________________
 
-Good `fix_instructions` are:
+## 6. Layout
 
-- specific to files/behaviors
-- minimal in scope
-- testable with clear acceptance checks
-- ordered when steps depend on each other
+- `~/.config/opencode/agents/`: role prompts
+- repo `docs/workflow/`: schemas, templates, and workflow contracts
+- `~/.config/opencode/rules/`: reusable cross-cutting references
+- `~/.config/opencode/skills/`: optional task-local skills loaded through the skill adapter rules
 
-Avoid:
-
-- vague feedback ("improve quality", "clean this up")
-- mixed unrelated requests in one item
-- requirements without validation criteria
-
-Example (good):
-
-"In `src/cache.ts`, handle TTL parse failures by returning a typed error instead of defaulting to `0`; add a test that asserts invalid TTL returns `ConfigError::InvalidTtl`."
-
-Example (bad):
-
-"Caching is risky; please make it safer."
-
----
-
-## 6) Stage collaboration etiquette
-
-- Respect prior stage decisions unless new evidence shows risk or contradiction.
-- Do not re-scope the task without a concrete reason.
-- Preserve useful context from upstream; do not force downstream stages to rediscover it.
-- Prefer smallest-change guidance that still satisfies acceptance criteria.
-- Keep language neutral and operational; avoid performative commentary.
-
----
-
-## 7) Practical checklists (non-binding reminders)
-
-Analyzer:
-
-- restate objective clearly
-- list assumptions/constraints
-- define acceptance criteria and risk framing
-
-Researcher:
-
-- map relevant files/systems
-- capture existing patterns and constraints
-- flag unknowns that affect plan viability
-
-Planner:
-
-- produce executable steps
-- align validation depth with risk
-- choose appropriate coder path
-
-Coder:
-
-- implement only approved scope
-- keep changes focused and reversible
-- report exactly what changed
-
-Reviewer:
-
-- decide: approved / changes_required / blocked
-- provide concrete remediation when not approved
-- include acceptance checks for each fix item
-
-Tester:
-
-- validate behavior and failure paths
-- separate pass/fail from confidence notes
-- report residual risk when coverage is partial
-
-Technical writer:
-
-- update impacted docs only
-- keep docs concise and task-scoped
-- no-op explicitly when docs impact is zero
-
-Summarizer:
-
-- produce structured + human summaries
-- include validation, assumptions, and residual risks
-- clearly mark skipped stages/checks and reasons
-
----
-
-## 8) Token and readability hygiene
-
-- Prefer compact, high-signal outputs.
-- Avoid repeating unchanged context from earlier stages.
-- Use stable field names and ordering when possible.
-- Keep examples short and directly relevant to the active task.
-
-This playbook is intentionally lightweight. Add guidance here only when it improves cross-stage clarity.
+This file is intentionally small. Put role behavior in role prompts and reusable detail in references.

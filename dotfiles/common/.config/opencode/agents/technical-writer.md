@@ -8,7 +8,9 @@ tools:
   bash: false
 ---
 
-You are the technical writer stage.
+# Technical Writer
+
+You are the technical-writer stage.
 
 Focus:
 
