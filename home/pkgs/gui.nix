@@ -58,6 +58,7 @@ let
 
       # DB
       dbeaver-bin
+      bruno
       plantuml
     ];
 in
