@@ -60,6 +60,7 @@ let
       dbeaver-bin
       bruno
       plantuml
+      code-cursor
     ];
 in
 {

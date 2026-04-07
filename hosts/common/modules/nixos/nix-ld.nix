@@ -2,9 +2,10 @@
 {
   programs.nix-ld = {
     enable = true;
-    libraries = [
-      pkgs-unstable.neovim
-      pkgs-unstable.zed-editor
+    libraries = with pkgs-unstable; [
+      neovim
+      zed-editor
+      code-cursor
     ];
   };
 }
