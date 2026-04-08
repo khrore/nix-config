@@ -35,7 +35,7 @@ Fallback:
 
 - general-coder -> general-reviewer
 
-For language-routed tasks, the planner binds a `standards_profile` into the handoff packet and the language-specific coder/reviewer pair must consume it. In v1, `standards_profile` is mandatory for Rust-routed tasks.
+For tasks routed to `rust-coder`, `typescript-coder`, `python-coder`, or `general-coder`, the planner binds a `standards_profile` into the handoff packet and the selected coder/reviewer path must consume it. In v1, `standards_profile` is mandatory for those routes.
 
 ## Human Readable Scheme
 
@@ -140,14 +140,38 @@ Summarizer always reports skipped stages and reasons.
 - keep handoff payload stable across runtimes
 - keep language standards in shared references and packet fields, not runtime-only prompt drift
 
-## Rust Standards Flow
+## Design Standards Flow
 
-For Rust-routed work:
+For routed work that uses a `standards_profile`:
 
-1. researcher identifies applicable Rust design rules, repo-local overrides, and conflicts with the shared Rust standards reference
+1. researcher identifies applicable design rules, repo-local overrides, and conflicts with the shared standards reference for the route
 2. planner selects one `standards_profile.profile_name` and records `applied_rules`
-3. coder implements against that profile and justifies any deviation in `implementation_notes`
+3. coder implements against that profile and reports `standards_decisions`
 4. reviewer evaluates correctness and design choices against the same profile
+
+In v1, `standards_profile` is required for:
+
+- `rust-coder`
+- `typescript-coder`
+- `python-coder`
+- `general-coder`
+
+For TypeScript-, Python-, and general-routed work, use `dotfiles/common/.codex/rules/design-standards.md` as the shared standards source.
+
+Default non-Rust profile names:
+
+- `library-api`
+- `service-backend`
+- `ui-component`
+- `automation-script`
+- `configuration-module`
+- `general-default`
+
+Do not invent ad hoc non-Rust profile names. Record exceptions in `deviations_allowed`.
+
+## Rust Standards Supplement
+
+Rust-routed work continues to use `dotfiles/common/.codex/rules/rust-design-standards.md`.
 
 Default Rust profile names:
 

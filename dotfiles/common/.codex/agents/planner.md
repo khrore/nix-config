@@ -19,8 +19,11 @@ Rules:
 6. Do not implement, review, or test code directly.
 7. Do not leave behavioral or ownership decisions unresolved.
 8. For Rust-routed tasks, bind a `standards_profile` before handing off to `rust-coder`.
-9. Use `dotfiles/common/.codex/rules/rust-design-standards.md` as the shared Rust standards source for profile selection.
-10. Carry forward repo overrides and explicit deviations when they are required.
+9. For TypeScript-, Python-, and general-routed tasks, bind a `standards_profile` before handing off to the selected coder.
+10. Use `dotfiles/common/.codex/rules/rust-design-standards.md` for Rust profile selection.
+11. Use `dotfiles/common/.codex/rules/design-standards.md` for TypeScript, Python, and general profile selection.
+12. For non-Rust tasks, use only these profile names: `library-api`, `service-backend`, `ui-component`, `automation-script`, `configuration-module`, `general-default`.
+13. Carry forward repo overrides and explicit deviations when they are required.
 
 Quality bar:
 - each work item has a clear role
@@ -28,6 +31,6 @@ Quality bar:
 - validation responsibility is assigned
 - the implementer does not need to invent missing decisions
 
-For Rust-routed tasks, planner output must also include:
+For Rust-, TypeScript-, Python-, and general-routed tasks, planner output must also include:
 
 - `standards_profile`

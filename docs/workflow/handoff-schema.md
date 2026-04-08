@@ -22,7 +22,7 @@ This schema is runtime-neutral and shared by all adapters.
 - `external_calls`
 - `trust_notes`
 
-`standards_profile` is an optional global field in the shared schema and is required for Rust-routed tasks in v1.
+`standards_profile` is an optional global field in the shared schema and is required in v1 when `next_agent` is `rust-coder`, `typescript-coder`, `python-coder`, or `general-coder`.
 
 ## Optional Global Fields
 
@@ -51,6 +51,25 @@ This schema is runtime-neutral and shared by all adapters.
 - `repo_overrides` (array of strings)
 - `deviations_allowed` (array of strings)
 
+For TypeScript, Python, and general-routed tasks, use one of these fixed `profile_name` values:
+
+- `library-api`
+- `service-backend`
+- `ui-component`
+- `automation-script`
+- `configuration-module`
+- `general-default`
+
+Do not invent new non-Rust profile names; record exceptions in `deviations_allowed`.
+
+## `standards_decisions` Object
+
+Include this worker-result object whenever `standards_profile` is bound.
+
+- `rules_applied` (array of strings)
+- `repo_overrides_followed` (array of strings)
+- `deviations_used` (array of strings)
+
 ## Stage Specific Required Fields
 
 - analyzer:
@@ -59,15 +78,16 @@ This schema is runtime-neutral and shared by all adapters.
 - researcher:
   - `code_map`
   - `existing_patterns`
-  - include `standards_profile` recommendations when the task is language-routed
+  - include `standards_profile` recommendations when the task is routed to `rust-coder`, `typescript-coder`, `python-coder`, or `general-coder`
 - planner:
   - `execution_plan`
   - `validation_plan`
   - `agent_selection`
-  - include bound `standards_profile` when the selected agent is language-specific
+  - include bound `standards_profile` when the selected agent is `rust-coder`, `typescript-coder`, `python-coder`, or `general-coder`
 - coder:
   - `change_log`
   - `implementation_notes`
+  - include `standards_decisions` whenever `standards_profile` is bound
 - reviewer:
   - `review_outcome` (`approved | changes_required | blocked`)
   - `fix_instructions`
@@ -111,10 +131,23 @@ Each item must include:
   "review_cycle_count": 1,
   "standards_profile": {
     "language": "typescript",
-    "profile_name": "service-default",
-    "applied_rules": [],
+    "profile_name": "service-backend",
+    "applied_rules": [
+      "single-reason-to-change",
+      "composition-over-hierarchy",
+      "explicit-error-model"
+    ],
     "repo_overrides": [],
     "deviations_allowed": []
+  },
+  "standards_decisions": {
+    "rules_applied": [
+      "single-reason-to-change",
+      "composition-over-hierarchy",
+      "explicit-error-model"
+    ],
+    "repo_overrides_followed": [],
+    "deviations_used": []
   },
   "review_outcome": "changes_required",
   "fix_instructions": [
