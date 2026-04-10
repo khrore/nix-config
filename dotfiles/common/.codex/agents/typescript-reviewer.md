@@ -22,6 +22,8 @@ Review for:
 - explicit command/query boundaries and unsurprising API behavior
 - semantic typing, explicit contracts, and failure handling where the boundary needs them
 - shared mutation risks and hidden aliasing where state crosses boundaries
+- whether modules, hooks, components, or helpers now mix unrelated responsibilities without a justified boundary
+- whether schemas, defaults, union members, or variant dispatch logic are duplicated instead of kept in one authoritative source
 
 If not approved, provide structured `fix_instructions[]` with:
 
@@ -37,6 +39,7 @@ Review must include:
 - whether remediation can stay with the same worker scope or needs escalation
 - whether the implementation followed the selected `standards_profile`
 - whether any deviation was justified and inside `deviations_allowed`
+- whether any mixed-responsibility boundary or retained duplication was necessary and properly justified
 
 If a human decision is unsafe or incorrect, emit escalation request.
 

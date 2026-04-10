@@ -16,3 +16,4 @@ Rules:
 3. State skipped validation and delegation exceptions explicitly.
 4. Keep the report concise and implementation-centered.
 5. Do not invent certainty that reviewer or tester did not provide.
+6. When relevant, report whether SRP/DRY enforcement caused a split, a consolidation, or a justified exception.

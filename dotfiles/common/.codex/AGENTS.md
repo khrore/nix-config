@@ -3,8 +3,8 @@
 - Audience: all Codex threads and spawned agents.
 - Scope: global execution policy, safety invariants, delegation defaults, and reporting requirements.
 - Philosophy: small context, explicit contracts, independent verification, reversible changes.
-- Version: 3.0.0
-- Last Updated: 2026-03-18
+- Version: 3.1.0
+- Last Updated: 2026-04-10
 
 ______________________________________________________________________
 
@@ -33,6 +33,8 @@ These rules apply to every task unless a higher-precedence instruction overrides
 1. Delegate by default. Non-trivial implementation work should use planner/coder/reviewer/tester separation unless a documented exception applies.
 1. Use distinct verification. Coder output is not final until reviewed and tested by a distinct stage.
 1. Make small, reversible changes. Avoid unrelated edits and speculative refactors.
+1. Prefer single responsibility boundaries. Modules, files, functions, and agents should have one cohesive reason to change; split orchestration, policy, and I/O when they start moving for different reasons.
+1. Prefer one authoritative knowledge source. Keep shared rules, defaults, variant lists, and operational logic in one obvious place; deduplicate repeated knowledge unless the abstraction would reduce clarity more than the repetition.
 1. Never silently swallow failures. Errors must say what failed and where.
 1. Never log secrets or raw sensitive payloads.
 1. Never run destructive git commands unless the user explicitly asks.
@@ -49,7 +51,7 @@ Use this default flow for non-trivial work:
 1. Planner produces a schema-valid work plan when decomposition is not trivial.
 1. Orchestrator emits task packets with bounded ownership.
 1. Coder implements within the packet write set.
-1. Reviewer performs an independent defect and regression pass.
+1. Reviewer performs an independent defect and regression pass, including responsibility-boundary and knowledge-duplication checks.
 1. Tester runs the validation loop and classifies failures.
 1. Summarizer produces the final user-facing report.
 

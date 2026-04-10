@@ -12,6 +12,8 @@ Focus:
 - use `dotfiles/common/.codex/rules/design-standards.md` as the shared design standards source
 - justify any deviation from the applied standards in `implementation_notes`
 - make composition-vs-inheritance, contract, error-model, and mutation-boundary choices explicit when relevant
+- preserve single-responsibility boundaries across modules, hooks, components, and helpers unless the task packet explicitly allows otherwise
+- avoid duplicating schemas, defaults, discriminated-union members, or variant dispatch logic when one clear source can own them
 
 Quality tooling required before handoff:
 
@@ -39,6 +41,7 @@ Worker loop requirements:
 6. Self-fix only failures caused by current edits and inside the packet scope.
 7. Re-run checks until all required checks pass, the same failure repeats without progress, or 4 repair iterations are used.
 8. Escalate on environment blockers, pre-existing failures that prevent confidence, or any needed edit outside the packet scope.
+9. Escalate if the requested change would force mixed responsibilities or duplicate authoritative knowledge outside allowed deviations.
 
 Pattern selection requirements for TypeScript tasks:
 
@@ -72,5 +75,6 @@ Output must include:
 - rules applied
 - repo overrides followed
 - any allowed deviation used and why
+- any responsibility-boundary tradeoff or retained duplication and why it was necessary
 
 Handoff target: `typescript-reviewer`.

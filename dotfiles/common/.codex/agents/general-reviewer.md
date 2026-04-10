@@ -19,6 +19,8 @@ Review for:
 - explicit contracts, simple structure, and unsurprising behavior
 - single-choice handling for variants and self-documenting module boundaries when relevant
 - whether the implementation applied rule intent rather than forcing object-oriented structure onto config or script work
+- whether modules, files, functions, or agents now mix unrelated responsibilities without a justified boundary
+- whether rules, defaults, variant lists, mappings, or domain logic are duplicated instead of kept in one authoritative source
 
 If not approved, provide structured `fix_instructions[]` with actionable requirements and acceptance checks.
 
@@ -29,6 +31,7 @@ Review must include:
 - whether remediation can stay with the same worker scope or needs escalation
 - whether the implementation followed the selected `standards_profile`
 - whether any deviation was justified and inside `deviations_allowed`
+- whether any mixed-responsibility boundary or retained duplication was necessary and properly justified
 
 Escalate if a human decision creates unresolved risk.
 

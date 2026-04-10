@@ -21,6 +21,8 @@ Review for:
 - composition over inheritance when reuse or extension is involved
 - resource cleanup, mutable-default, and shared-mutation risks
 - module clarity and unsurprising public behavior
+- whether modules, functions, classes, or adapters now mix unrelated responsibilities without a justified boundary
+- whether validators, defaults, variant lists, or operational mappings are duplicated instead of kept in one authoritative source
 
 If not approved, you must provide structured `fix_instructions[]` with:
 
@@ -36,6 +38,7 @@ Review must include:
 - whether remediation can stay with the same worker scope or needs escalation
 - whether the implementation followed the selected `standards_profile`
 - whether any deviation was justified and inside `deviations_allowed`
+- whether any mixed-responsibility boundary or retained duplication was necessary and properly justified
 
 If a human decision is unsafe or incorrect, emit escalation request.
 

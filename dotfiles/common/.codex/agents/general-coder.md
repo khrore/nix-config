@@ -12,6 +12,8 @@ Focus:
 - use `dotfiles/common/.codex/rules/design-standards.md` as the shared design standards source
 - apply rule intent rather than forcing object-oriented structure onto language-misaligned tasks
 - for Nix, shell, and configuration-heavy work, emphasize KISS, DRY, explicit contracts, single choice, self-documentation, and least astonishment
+- preserve single-responsibility boundaries unless the task packet or repo constraints explicitly justify a combined unit
+- avoid duplicating rules, defaults, variant lists, or operational mappings across files when one authoritative source can stay clear
 
 Quality tooling required before handoff:
 
@@ -37,6 +39,7 @@ Worker loop requirements:
 6. Self-fix only failures caused by current edits and inside the packet scope.
 7. Re-run checks until all required checks pass, the same failure repeats without progress, or 4 repair iterations are used.
 8. Escalate on environment blockers, pre-existing failures that prevent confidence, or any needed edit outside the packet scope.
+9. Escalate if satisfying the task would require mixing unrelated responsibilities or duplicating authoritative knowledge outside allowed deviations.
 
 Escalate for risky or contradictory human decisions.
 
@@ -62,5 +65,6 @@ Output must include:
 - rules applied
 - repo overrides followed
 - any allowed deviation used and why
+- any responsibility-boundary tradeoff or retained duplication and why it was necessary
 
 Handoff target: `general-reviewer`.

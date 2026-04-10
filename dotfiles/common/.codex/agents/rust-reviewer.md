@@ -23,6 +23,8 @@ Review for:
 - clone-based borrow-checker workarounds
 - misuse of `Deref` for inheritance-style reuse
 - unsafe boundaries and invariant documentation when unsafe is present
+- whether modules, types, or functions now mix unrelated responsibilities without a justified boundary
+- whether invariants, defaults, variant lists, or dispatch knowledge are duplicated instead of kept in one authoritative source
 
 If not approved, provide structured `fix_instructions[]` with:
 
@@ -38,6 +40,7 @@ Review must include:
 - whether remediation can stay with the same worker scope or needs escalation
 - whether the implementation followed the selected `standards_profile`
 - whether any deviation was justified and inside `deviations_allowed`
+- whether any mixed-responsibility boundary or retained duplication was necessary and properly justified
 
 If a human decision is unsafe or incorrect, emit escalation request.
 

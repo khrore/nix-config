@@ -12,6 +12,8 @@ Focus:
 - use `dotfiles/common/.codex/rules/rust-design-standards.md` as the shared Rust standards source
 - justify any deviation from the applied Rust standards in `implementation_notes`
 - make borrow-vs-clone, constructor-vs-builder, and unsafe-boundary choices explicit when relevant
+- preserve single-responsibility boundaries across modules, types, and functions unless the task packet explicitly allows otherwise
+- avoid duplicating invariants, defaults, variant lists, or dispatch knowledge when one clear source can own them
 
 Quality tooling required before handoff:
 
@@ -37,6 +39,7 @@ Worker loop requirements:
 6. Self-fix only failures caused by current edits and inside the packet scope.
 7. Re-run checks until all required checks pass, the same failure repeats without progress, or 4 repair iterations are used.
 8. Escalate on environment blockers, pre-existing failures that prevent confidence, or any needed edit outside the packet scope.
+9. Escalate if the requested change would force mixed responsibilities or duplicate authoritative knowledge outside allowed deviations.
 
 If requirements conflict with safety or correctness, emit escalation for human decision.
 
@@ -71,5 +74,6 @@ Output must include:
 - rules applied
 - repo overrides followed
 - any allowed deviation used and why
+- any responsibility-boundary tradeoff or retained duplication and why it was necessary
 
 Handoff target: `rust-reviewer`.
