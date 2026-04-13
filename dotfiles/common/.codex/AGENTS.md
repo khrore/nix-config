@@ -3,8 +3,8 @@
 - Audience: all Codex threads and spawned agents.
 - Scope: global execution policy, safety invariants, delegation defaults, and reporting requirements.
 - Philosophy: small context, explicit contracts, independent verification, reversible changes.
-- Version: 3.1.0
-- Last Updated: 2026-04-10
+- Version: 3.1.1
+- Last Updated: 2026-04-13
 
 ______________________________________________________________________
 
@@ -78,6 +78,8 @@ Classify failures as one of:
 - scope-expanding
 
 Do not claim success without command evidence.
+
+Linter warnings are not ignorable by default. Treat any linter warning on touched code as a failure that must be fixed or explicitly escalated with justification before handoff or completion.
 
 ______________________________________________________________________
 
