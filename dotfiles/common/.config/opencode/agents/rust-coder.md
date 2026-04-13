@@ -22,6 +22,8 @@ Focus:
 - use `dotfiles/common/.config/opencode/rules/rust-design-standards.md` as the shared Rust standards source
 - justify any deviation from the applied Rust standards in `implementation_notes`
 - make borrow-vs-clone, constructor-vs-builder, and unsafe-boundary choices explicit when relevant
+- verify crate/package ownership and module declaration paths before editing Rust files
+- treat `mod`, crate roots, public API exposure, and `Cargo.toml` as coordinated topology edits, not incidental follow-up cleanup
 
 Quality tooling required before handoff:
 
@@ -42,11 +44,14 @@ Worker loop requirements:
 1. Inspect only packet-scoped files first.
 2. Edit only inside the packet `write_set`.
 3. Inspect `standards_profile` before editing and follow its `applied_rules`, `repo_overrides`, and `deviations_allowed`.
-4. Run packet-defined checks in order.
-5. Classify failures using `docs/workflow/failure-taxonomy.md`.
-6. Self-fix only failures caused by current edits and inside the packet scope.
-7. Re-run checks until all required checks pass, the same failure repeats without progress, or 4 repair iterations are used.
-8. Escalate on environment blockers, pre-existing failures that prevent confidence, or any needed edit outside the packet scope.
+4. For Rust changes, confirm the owning crate root and parent module declaration chain before creating, moving, or renaming files.
+5. If the packet includes `module_topology_notes`, follow them and escalate instead of guessing when repo reality conflicts.
+6. Run packet-defined checks in order.
+7. Classify failures using `docs/workflow/failure-taxonomy.md`.
+8. Self-fix only failures caused by current edits and inside the packet scope.
+9. Re-run checks until all required checks pass, the same failure repeats without progress, or 4 repair iterations are used.
+10. Escalate on environment blockers, pre-existing failures that prevent confidence, or any needed edit outside the packet scope.
+11. Escalate instead of inventing crate/module wiring when ownership, public exposure, or dependency placement is ambiguous.
 
 If requirements conflict with safety or correctness, emit escalation for human decision.
 
@@ -58,6 +63,9 @@ Pattern selection requirements for Rust tasks:
 - avoid clone-based borrow-checker workarounds
 - keep unsafe boundaries narrow and documented when unsafe is required
 - do not use `Deref` to emulate inheritance or implicit domain reuse
+- do not introduce `pub use`, `pub(super)`, or `pub(crate)` unless the task packet carries an explicit repo-level exception
+- prefer existing module layout over introducing parallel modules or visibility widening
+- never rely on a new `use` statement to make undeclared modules reachable; add the correct module declaration or escalate
 
 Output must include:
 
@@ -81,5 +89,6 @@ Output must include:
 - rules applied
 - repo overrides followed
 - any allowed deviation used and why
+- crate root, parent module, public API exposure, and dependency-manifest decisions made for the change
 
 Handoff target: `rust-reviewer`.

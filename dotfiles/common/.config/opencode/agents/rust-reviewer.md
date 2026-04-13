@@ -33,6 +33,8 @@ Review for:
 - clone-based borrow-checker workarounds
 - misuse of `Deref` for inheritance-style reuse
 - unsafe boundaries and invariant documentation when unsafe is present
+- whether the change respects crate/package ownership, parent module declarations, crate roots, and intended public API boundaries
+- whether `Cargo.toml` edits, public exposure changes, or import rewrites are topology-correct rather than compile-only shortcuts
 
 If not approved, provide structured `fix_instructions[]` with:
 

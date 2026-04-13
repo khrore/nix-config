@@ -37,6 +37,8 @@ Fallback:
 
 For tasks routed to `rust-coder`, `typescript-coder`, `python-coder`, or `general-coder`, the planner binds a `standards_profile` into the handoff packet and the selected coder/reviewer path must consume it. In v1, `standards_profile` is mandatory for those routes.
 
+For tasks routed to `rust-coder`, the researcher and planner should also bind crate/module topology context so implementation does not guess at crate ownership, module declarations, or manifest changes.
+
 ## Human Readable Scheme
 
 ```text
@@ -172,6 +174,8 @@ Do not invent ad hoc non-Rust profile names. Record exceptions in `deviations_al
 ## Rust Standards Supplement
 
 Rust-routed work continues to use `dotfiles/common/.codex/rules/rust-design-standards.md`.
+
+Rust-routed handoffs should also carry `module_topology_notes` when the task might touch file placement, `mod` declarations, public API surfaces, crate roots, or `Cargo.toml`.
 
 Default Rust profile names:
 

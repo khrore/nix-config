@@ -31,6 +31,7 @@ Rules:
 8. For Rust-routed tasks, bind a `standards_profile` before handing off to `rust-coder`.
 9. Use `dotfiles/common/.config/opencode/rules/rust-design-standards.md` as the shared Rust standards source for profile selection.
 10. Carry forward repo overrides and explicit deviations when they are required.
+11. For Rust-routed tasks, make package ownership, crate root touch points, module declaration changes, public API changes, and `Cargo.toml` edits explicit instead of leaving them implicit for the coder to infer.
 
 Quality bar:
 - each work item has a clear role
@@ -41,3 +42,4 @@ Quality bar:
 For Rust-routed tasks, planner output must also include:
 
 - `standards_profile`
+- `module_topology_notes`

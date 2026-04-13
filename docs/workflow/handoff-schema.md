@@ -27,6 +27,7 @@ This schema is runtime-neutral and shared by all adapters.
 ## Optional Global Fields
 
 - `standards_profile`
+- `module_topology_notes`
 
 ## `skip` Object
 
@@ -84,6 +85,7 @@ Include this worker-result object whenever `standards_profile` is bound.
   - `validation_plan`
   - `agent_selection`
   - include bound `standards_profile` when the selected agent is `rust-coder`, `typescript-coder`, `python-coder`, or `general-coder`
+  - for Rust-routed tasks, include `module_topology_notes` covering package ownership, crate roots, parent module declarations, public API touch points, and manifest implications
 - coder:
   - `change_log`
   - `implementation_notes`

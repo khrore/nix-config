@@ -26,6 +26,7 @@ Rules:
 13. Carry forward repo overrides and explicit deviations when they are required.
 14. Default to single-responsibility work items. If a plan item spans orchestration, policy, formatting, persistence, or adapter concerns, explain why that boundary should stay combined.
 15. Default to one knowledge source per rule, default, variant list, or operational mapping. If duplication is retained, record why the duplication is intentional and lower-risk than abstraction.
+16. For Rust-routed tasks, make package ownership, crate root touch points, module declaration changes, public API changes, and `Cargo.toml` edits explicit instead of leaving them implicit for the coder to infer.
 
 Quality bar:
 - each work item has a clear role
@@ -39,3 +40,4 @@ For Rust-, TypeScript-, Python-, and general-routed tasks, planner output must a
 - `standards_profile`
 - `responsibility_boundaries`
 - `duplication_risks`
+- `module_topology_notes`

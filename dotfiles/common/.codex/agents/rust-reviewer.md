@@ -25,6 +25,8 @@ Review for:
 - unsafe boundaries and invariant documentation when unsafe is present
 - whether modules, types, or functions now mix unrelated responsibilities without a justified boundary
 - whether invariants, defaults, variant lists, or dispatch knowledge are duplicated instead of kept in one authoritative source
+- whether the change respects crate/package ownership, parent module declarations, crate roots, and intended public API boundaries
+- whether `Cargo.toml` edits, public exposure changes, or import rewrites are topology-correct rather than compile-only shortcuts
 
 If not approved, provide structured `fix_instructions[]` with:
 
