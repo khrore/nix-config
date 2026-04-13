@@ -33,7 +33,7 @@ User chooses one mode when creating workflow:
 
 - reviewer returns `approved`, `changes_required`, or `blocked`
 - `changes_required` must include structured `fix_instructions`
-- workflow loops to same coder
+- workflow loops to the same implementation owner
 - stop after `max_review_cycles` and escalate to human
 
 ## Skip Policy

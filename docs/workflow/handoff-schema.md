@@ -24,6 +24,8 @@ This schema is runtime-neutral and shared by all adapters.
 
 `standards_profile` is an optional global field in the shared schema and is required in v1 when `next_agent` is `rust-coder`, `typescript-coder`, `python-coder`, or `general-coder`.
 
+In the Codex adapter, the same `standards_profile` requirement applies when implementation stays in the main thread instead of a writable child coder.
+
 ## Optional Global Fields
 
 - `standards_profile`
@@ -90,6 +92,8 @@ Include this worker-result object whenever `standards_profile` is bound.
   - `change_log`
   - `implementation_notes`
   - include `standards_decisions` whenever `standards_profile` is bound
+
+For the Codex adapter, the `coder` stage fields double as the main-thread implementation result when no writable child coder exists.
 - reviewer:
   - `review_outcome` (`approved | changes_required | blocked`)
   - `fix_instructions`

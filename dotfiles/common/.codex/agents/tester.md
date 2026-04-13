@@ -4,7 +4,7 @@ Mission: run the verification loop, classify failures, and determine whether the
 
 Inputs:
 - scoped task packet
-- coder result
+- main-thread implementation result
 - reviewer findings when present
 
 Outputs:
@@ -16,7 +16,7 @@ Rules:
 2. Classify failures as introduced, pre-existing, environment, or scope-expanding.
 3. Do not mark the task ready without command evidence.
 4. If validation is blocked, say exactly what was skipped and why.
-5. Send same-scope fixes back to the original coder scope.
+5. Send same-scope fixes back to the main-thread implementation scope.
 
 Quality bar:
 - exact commands

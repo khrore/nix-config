@@ -30,8 +30,8 @@ These rules apply to every task unless a higher-precedence instruction overrides
 1. Inspect before mutation. Read the relevant code, config, or docs before editing.
 1. Keep context small. Load only the global kernel, the active role prompt, and task-relevant references.
 1. Use explicit contracts. Non-trivial delegated work must use schema-valid workflow packets.
-1. Delegate by default. Non-trivial implementation work should use planner/coder/reviewer/tester separation unless a documented exception applies.
-1. Use distinct verification. Coder output is not final until reviewed and tested by a distinct stage.
+1. Spawn child agents only on explicit user request. In the Codex runtime, child agents are read-only and must not own edits.
+1. Use distinct verification. Main-thread implementation output is not final until reviewed and tested by a distinct stage or distinct verification pass.
 1. Make small, reversible changes. Avoid unrelated edits and speculative refactors.
 1. Prefer single responsibility boundaries. Modules, files, functions, and agents should have one cohesive reason to change; split orchestration, policy, and I/O when they start moving for different reasons.
 1. Prefer one authoritative knowledge source. Keep shared rules, defaults, variant lists, and operational logic in one obvious place; deduplicate repeated knowledge unless the abstraction would reduce clarity more than the repetition.
@@ -46,16 +46,16 @@ ______________________________________________________________________
 
 Use this default flow for non-trivial work:
 
-1. Main thread acts as orchestrator.
+1. Main thread acts as orchestrator and implementation owner.
 1. Orchestrator inspects scope, risk, dependencies, and likely write sets.
 1. Planner produces a schema-valid work plan when decomposition is not trivial.
-1. Orchestrator emits task packets with bounded ownership.
-1. Coder implements within the packet write set.
+1. On explicit user request, orchestrator may emit read-only task packets with an empty `write_set` for analysis, review, or test assistance.
+1. Main thread implements and validates changes locally using `~/.codex/rules/implementation-standards.md`.
 1. Reviewer performs an independent defect and regression pass, including responsibility-boundary and knowledge-duplication checks.
 1. Tester runs the validation loop and classifies failures.
 1. Summarizer produces the final user-facing report.
 
-Delegation exceptions are allowed only when the task is trivial, no useful sub-agent capability exists, or decomposition would add more risk than value. The final report must state why delegation was skipped.
+Delegation exceptions are allowed only when the task is trivial, no useful read-only sub-agent capability exists, or decomposition would add more risk than value. The final report must state why delegation was skipped.
 
 ______________________________________________________________________
 
@@ -102,6 +102,7 @@ ______________________________________________________________________
 - `~/.codex/agents/`: role prompts
 - `~/.codex/docs/workflow/`: schemas, templates, and workflow contracts
 - `~/.codex/rules/`: reusable cross-cutting references
+- `~/.codex/rules/implementation-standards.md`: shared implementation rules for main-thread edits and verification
 - `~/.codex/skills/`: optional task-local skills loaded through the skill adapter rules
 
 This file is intentionally small. Put role behavior in role prompts and reusable detail in references.

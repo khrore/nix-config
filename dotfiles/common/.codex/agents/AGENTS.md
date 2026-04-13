@@ -12,10 +12,11 @@ Use this file as a lightweight playbook to keep stage outputs consistent and eas
 
 This file does not replace:
 
-- `main-thread-orchestration.md` for automatic queue control and loop routing by the main Codex thread
-- stage prompts (`analyzer`, `researcher`, `planner`, `coder`, `reviewer`, `tester`, `technical-writer`, `summarizer`) for role-specific rules
+- `main-thread-orchestration.md` for queue control and loop routing by the main Codex thread
+- stage prompts (`analyzer`, `researcher`, `planner`, `reviewer`, `tester`, `technical-writer`, `summarizer`) for role-specific rules
 - workflow docs in `docs/workflow/` for canonical schema and policy definitions
 - parent `../AGENTS.md` for shared engineering standards
+- `../rules/implementation-standards.md` for main-thread implementation rules
 
 If there is a conflict, follow the shared workflow docs first, then the stage prompt, then this playbook.
 
@@ -25,18 +26,20 @@ If there is a conflict, follow the shared workflow docs first, then the stage pr
 
 Default queue:
 
-`analyzer -> researcher -> planner -> coder -> reviewer -> tester -> technical-writer -> summarizer`
+`analyzer -> researcher -> planner -> main-thread-implementation -> reviewer -> tester -> technical-writer -> summarizer`
 
 Codex operating model:
 
-- the main Codex thread automatically handles decomposition, spawn decisions, and result merging
-- child agents should receive validated task packets from `docs/workflow/`
+- the main Codex thread handles decomposition, edits, validation, and result merging
+- child agents are read-only and should receive validated task packets from `docs/workflow/`
+- spawn child agents only when the user explicitly requests delegation
+- child agents must have an empty `write_set`
 - `fork_context=false` is the default unless a narrow follow-up requires inherited context
 
 Common loop:
 
 - reviewer returns `changes_required`
-- route back to the same coder with actionable `fix_instructions`
+- route back to the main thread implementation owner with actionable `fix_instructions`
 - repeat until approved or review-cycle limit is reached
 
 Escalation is context-driven via workflow settings (for example `escalation_policy`, `max_review_cycles`).
@@ -53,14 +56,15 @@ Every handoff should be easy for the next stage to execute without guessing.
 - Call out unknowns that can change implementation behavior.
 - Include evidence references (files, checks, observations), not just conclusions.
 - If work is skipped, state what was skipped and why.
-- Report scoped `read_set` and `write_set` boundaries whenever child work is delegated.
+- Report scoped `read_set` boundaries whenever child work is delegated.
+- Keep delegated `write_set` empty for every child-agent packet.
 
 Recommended status vocabulary:
 
 - `ready`: stage finished and handoff is complete
 - `needs_human`: stage cannot continue without a decision
 - `blocked`: cannot proceed due to missing input, tooling, or precondition
-- `changes_required`: reviewer requests coder remediation
+- `changes_required`: reviewer requests implementation remediation
 - `done`: terminal completion, typically summarizer
 
 ---
@@ -78,7 +82,7 @@ Avoid broad or multi-part questions that delay routing.
 
 ---
 
-## 5) Reviewer -> coder remediation quality
+## 5) Reviewer -> implementation remediation quality
 
 `fix_instructions` should be actionable and verifiable.
 
@@ -112,7 +116,7 @@ Example, bad:
 - Preserve useful context from upstream; do not force downstream stages to rediscover it.
 - Prefer smallest-change guidance that still satisfies acceptance criteria.
 - Keep language neutral and operational; avoid performative commentary.
-- Reuse an existing child agent only for same-scope remediation; start a fresh child for unrelated work.
+- Reuse an existing child agent only for same-scope follow-up analysis; start a fresh child for unrelated work.
 - Close child agents when their scoped task is complete instead of letting them accumulate stale context.
 
 ---
@@ -135,15 +139,16 @@ Planner:
 
 - produce executable steps
 - align validation depth with risk
-- choose appropriate child-agent path
+- choose whether read-only child analysis is useful enough to justify spawning
 - split into bounded work items with clear ownership and dependencies
 
-Coder:
+Main-thread implementation:
 
+- follow `../rules/implementation-standards.md`
 - implement only approved scope
 - keep changes focused and reversible
 - report exactly what changed
-- run the packet-defined self-repair loop before handoff
+- run the required validation loop before handoff
 
 Reviewer:
 
@@ -178,6 +183,6 @@ Summarizer:
 - Avoid repeating unchanged context from earlier stages.
 - Use stable field names and ordering when possible.
 - Keep examples short and directly relevant to the active task.
-- Prefer task packets, work plans, and worker results from `docs/workflow/` over ad hoc prompt prose.
+- Prefer task packets, work plans, and implementation/review results from `docs/workflow/` over ad hoc prompt prose.
 
 This playbook is intentionally lightweight. Add guidance here only when it improves cross-stage clarity.

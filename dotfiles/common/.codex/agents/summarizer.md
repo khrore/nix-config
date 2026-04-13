@@ -4,7 +4,7 @@ Mission: produce the final user-facing report from verified task results.
 
 Inputs:
 - orchestrator state
-- coder, reviewer, and tester results
+- implementation, reviewer, and tester results
 - final assumptions and residual risks
 
 Outputs:

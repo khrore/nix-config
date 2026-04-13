@@ -4,30 +4,33 @@ You are the automatic orchestration policy for the main Codex thread.
 
 Responsibilities:
 
-- automatically decompose work before spawning child agents
+- inspect locally before deciding whether child-agent help is warranted
 - enforce clean child-agent context and explicit ownership
-- route reviewer and tester remediation back to the same scoped worker when possible
+- own all repository edits and validation in the main thread
+- route reviewer and tester remediation back to the same main-thread implementation scope when possible
 - ask the human only when a true escalation boundary is hit
 
 Queue:
 
-`analyzer -> researcher -> planner -> coder -> reviewer -> tester -> technical-writer -> summarizer`
+`analyzer -> researcher -> planner -> main-thread-implementation -> reviewer -> tester -> technical-writer -> summarizer`
 
 Rules:
 
-1. The main Codex thread auto-orchestrates child-agent work. Do not spawn a dedicated orchestration agent.
-2. Inspect locally before spawning child agents for non-trivial work.
-3. Build a `work-plan` before spawning child agents when decomposition is not obvious from local inspection.
-4. Spawn only from validated `task-packet` documents from `docs/workflow/`.
-5. Default `fork_context=false`. Use `fork_context=true` only for narrow same-scope follow-up work and record why.
-6. Use `explorer` only for read-only bounded analysis. Explorer packets must have an empty `write_set`.
-7. Use `worker` only with an explicit `write_set`, `acceptance_checks`, and `tool_commands`.
-8. Parallelize only when child `write_set`s are disjoint. Otherwise keep execution sequential.
-9. If reviewer or tester returns same-scope remediation, route back to the same worker automatically with a remediation packet.
-10. If review cycles exceed `max_review_cycles`, escalate to human.
-11. When any stage returns `escalation.required=true`, ask the human only if the blocking issue cannot be resolved through local scoped remediation.
-12. Call `wait` only when blocked on dependencies or when no useful non-overlapping local work remains.
-13. Close child agents once their scoped task is complete.
+1. The main Codex thread is the only implementation owner. Do not spawn a dedicated orchestration agent.
+2. Inspect locally before considering child-agent delegation.
+3. Spawn child agents only when the user explicitly requests delegation.
+4. Build a `work-plan` before spawning child agents when decomposition is not obvious from local inspection.
+5. Spawn only from validated `task-packet` documents from `docs/workflow/`.
+6. Default `fork_context=false`. Use `fork_context=true` only for narrow same-scope follow-up work and record why.
+7. Use read-only child agents only for bounded analysis, review, or test investigation. Child packets must have an empty `write_set`.
+8. Never spawn writable coding agents or any child agent that edits repository files.
+9. The main thread performs all edits and validation using `dotfiles/common/.codex/rules/implementation-standards.md`.
+10. Parallelize child agents only when their read scopes are independent enough to avoid duplicated work.
+11. If reviewer or tester returns same-scope remediation, apply it in the main thread and keep the approved scope boundary.
+12. If review cycles exceed `max_review_cycles`, escalate to human.
+13. When any stage returns `escalation.required=true`, ask the human only if the blocking issue cannot be resolved through local scoped remediation.
+14. Call `wait` only when blocked on dependencies or when no useful non-overlapping local work remains.
+15. Close child agents once their scoped task is complete.
 
 Output:
 

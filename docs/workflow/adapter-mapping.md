@@ -40,11 +40,11 @@
 |---|---|
 | read_files | filesystem read/search tools |
 | search_code | glob/grep equivalents |
-| edit_code | patch/edit/write tools |
-| run_checks | shell tool command allowlists |
+| edit_code | patch/edit/write tools in the main thread only |
+| run_checks | shell tool command allowlists, typically in the main thread |
 | external_read | web/read-only integration access |
 | external_write | integration mutation permissions with gate |
-| orchestrate_subagents | subagent task invocation API |
+| orchestrate_subagents | read-only subagent task invocation API on explicit user request |
 
 ## Capability to Claude Runtime
 
@@ -62,7 +62,7 @@
 
 | Rule | OpenCode | Codex | Claude |
 |---|---|---|---|
-| fixed queue | `permission.task` + orchestrator prompt | orchestrator router + allowed child list | agent policy + allowed child list |
+| fixed queue | `permission.task` + orchestrator prompt | orchestrator router + read-only child allowlist + main-thread implementation owner | agent policy + allowed child list |
 | reviewer loop | payload `review_cycle_count` | session state counter | session state counter |
 | max cycles | workflow config override | workflow config override | workflow config override |
 | escalation | `escalation_policy` in payload | same | same |
