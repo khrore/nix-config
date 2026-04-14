@@ -24,7 +24,8 @@ This file captures repository-specific structure and intent so coding agents can
 Defined hosts:
 
 - `dev-4`: NixOS, `x86_64-linux`, user `khrore`
-- `nixos`: NixOS, `x86_64-linux`, user `khorer`
+- `nixos`: NixOS, `x86_64-linux`, user `khrore`
+- `vlinix`: NixOS, `aarch64-linux`, user `khrore`
 - `macix`: Darwin, `aarch64-darwin`, user `khrore`
 
 Core inputs in use:
@@ -92,7 +93,7 @@ Darwin-specific behavior:
 
 - Entry: `home/default.nix`
 - Uses global packages and user packages.
-- Imports all `home/pkgs/*.nix` bundles plus `home/link-dotfiles.nix`.
+- Imports all `home/pkgs/*.nix` bundles plus `home/omarchy.nix` and `home/link-dotfiles.nix`.
 - Enables `programs.home-manager.enable`.
 - In practice this layer is primarily used to install user packages and expose the `link-dotfiles` helper; dotfile linking can also be run manually outside a full Home Manager switch.
 

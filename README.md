@@ -4,7 +4,7 @@ Personal multi-host Nix flake for Linux and macOS. It uses Nix for system-level 
 
 ## What This Repo Defines
 
-- NixOS hosts: `dev-4`, `nixos`
+- NixOS hosts: `dev-4`, `nixos`, `vlinix`
 - Darwin host: `macix`
 - Shared system layer in `hosts/common`
 - Shared Home Manager layer in `home`
@@ -12,7 +12,7 @@ Personal multi-host Nix flake for Linux and macOS. It uses Nix for system-level 
 - Shared and platform-specific dotfiles in `dotfiles`
 - Multiagent workflow docs and runtime configs under `docs/workflow` and hidden files in `dotfiles/common`
 
-The flake entrypoint is [flake.nix](/Users/khrore/nixos/flake.nix). Host definitions are wired into `nixosConfigurations` and `darwinConfigurations`, with common `specialArgs` such as `hostName`, `username`, `system`, `pkgs-unstable`, and `mylib`.
+The flake entrypoint is [flake.nix](./flake.nix). Host definitions are wired into `nixosConfigurations` and `darwinConfigurations`, with common `specialArgs` such as `hostName`, `username`, `system`, `pkgs-unstable`, and `mylib`.
 
 ## Main Stack
 
@@ -25,7 +25,7 @@ This config is built around:
 - `agenix` plus a private `secrets` flake for secret material
 - Homebrew on macOS for native apps that are better managed outside Nix
 
-The helper library in [lib/default.nix](/Users/khrore/nixos/lib/default.nix) provides:
+The helper library in [lib/default.nix](./lib/default.nix) provides:
 
 - `scanPaths` to auto-import module directories
 - `scanFiles` to walk dotfile trees
@@ -44,7 +44,7 @@ The helper library in [lib/default.nix](/Users/khrore/nixos/lib/default.nix) pro
 
 ## Tooling Included
 
-The shared Home Manager package bundles are under [home/pkgs](/Users/khrore/nixos/home/pkgs).
+The shared Home Manager package bundles are under [home/pkgs](./home/pkgs).
 
 Highlights:
 
@@ -58,18 +58,18 @@ Highlights:
 
 ## Repo Structure
 
-- [hosts](/Users/khrore/nixos/hosts): host entrypoints and shared system modules
-- [home](/Users/khrore/nixos/home): Home Manager entrypoint, package bundles, and dotfile activation
-- [lib](/Users/khrore/nixos/lib): helper functions used across the flake
-- [dotfiles](/Users/khrore/nixos/dotfiles): source files linked into the user home directory
-- [docs/workflow](/Users/khrore/nixos/docs/workflow): multiagent workflow specification and adapter docs
+- [hosts](./hosts): host entrypoints and shared system modules
+- [home](./home): Home Manager entrypoint, package bundles, and dotfile activation
+- [lib](./lib): helper functions used across the flake
+- [dotfiles](./dotfiles): source files linked into the user home directory
+- [docs/workflow](./docs/workflow): multiagent workflow specification and adapter docs
 
 Composition flow:
 
 1. `flake.nix` selects a host.
 1. The host imports `hosts/common/default.nix`.
 1. `hosts/common/default.nix` imports shared system modules and `home/default.nix`.
-1. `home/default.nix` imports all package bundles and the `link-dotfiles` helper definition from `home/link-dotfiles.nix`.
+1. `home/default.nix` imports all package bundles, the Omarchy activation layer, and the `link-dotfiles` helper definition.
 1. Dotfiles are linked from `dotfiles/common` and the active platform directory when activation runs or when `link-dotfiles` is called manually.
 
 ## Using This In Your Own Environment
@@ -79,12 +79,12 @@ This repo is personal, so using it unchanged on another machine will usually fai
 Recommended path:
 
 1. Fork or copy the repository.
-1. Update the host map in [flake.nix](/Users/khrore/nixos/flake.nix) with your own host name, username, and target system.
+1. Update the host map in [flake.nix](./flake.nix) with your own host name, username, and target system.
 1. Remove or replace the private `secrets` input if you do not have access to `git@github.com/khrore/nixrets.git`.
 1. Replace Linux hardware files and `disko` definitions under your host directory.
-1. Review shared modules in [hosts/common](/Users/khrore/nixos/hosts/common) and disable anything you do not want globally, especially Hyprland, Docker, `localsend`, `throne`, SSH, and age secret paths.
-1. Trim or replace package bundles in [home/pkgs](/Users/khrore/nixos/home/pkgs) to match your workload.
-1. Add or replace files in [dotfiles](/Users/khrore/nixos/dotfiles) with your own configs.
+1. Review shared modules in [hosts/common](./hosts/common) and disable anything you do not want globally, especially Hyprland, Docker, `localsend`, `throne`, SSH, and age secret paths.
+1. Trim or replace package bundles in [home/pkgs](./home/pkgs) to match your workload.
+1. Add or replace files in [dotfiles](./dotfiles) with your own configs.
 
 ## Bootstrap Commands
 
@@ -110,7 +110,7 @@ The Darwin host in this repo also enables Homebrew integration, so the initial a
 
 ## Dotfiles Behavior
 
-[home/link-dotfiles.nix](/Users/khrore/nixos/home/link-dotfiles.nix) installs a `link-dotfiles` command and also hooks it into Home Manager activation. The dotfiles are not tightly coupled to Home Manager after that point: you can run `link-dotfiles` manually at any time to relink configs without reapplying the full Nix configuration.
+[home/link-dotfiles.nix](./home/link-dotfiles.nix) installs a `link-dotfiles` command and also hooks it into Home Manager activation. The dotfiles are not tightly coupled to Home Manager after that point: you can run `link-dotfiles` manually at any time to relink configs without reapplying the full Nix configuration.
 
 At runtime the script searches for the repo in:
 
@@ -144,10 +144,10 @@ Some evaluation paths may still require access to the private `secrets` flake.
 
 This repo also contains a portable multiagent workflow spec. The main docs are:
 
-- [docs/workflow/core-spec.md](/Users/khrore/nixos/docs/workflow/core-spec.md)
-- [docs/workflow/handoff-schema.md](/Users/khrore/nixos/docs/workflow/handoff-schema.md)
-- [docs/workflow/policy.md](/Users/khrore/nixos/docs/workflow/policy.md)
-- [docs/workflow/adapter-mapping.md](/Users/khrore/nixos/docs/workflow/adapter-mapping.md)
-- [docs/workflow/implementation-plan.md](/Users/khrore/nixos/docs/workflow/implementation-plan.md)
+- [docs/workflow/core-spec.md](./docs/workflow/core-spec.md)
+- [docs/workflow/handoff-schema.md](./docs/workflow/handoff-schema.md)
+- [docs/workflow/policy.md](./docs/workflow/policy.md)
+- [docs/workflow/adapter-mapping.md](./docs/workflow/adapter-mapping.md)
+- [docs/workflow/implementation-plan.md](./docs/workflow/implementation-plan.md)
 
 Runtime-specific configs live under hidden files in `dotfiles/common`, including OpenCode and Codex agent configuration.

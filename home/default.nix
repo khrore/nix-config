@@ -34,6 +34,7 @@
       };
 
       imports = mylib.scanPaths ./pkgs ++ [
+        ./omarchy.nix
         ./link-dotfiles.nix
       ];
 
