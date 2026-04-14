@@ -16,7 +16,7 @@ Apply instructions in this order:
 1. Verified environment and repo reality
 1. This `AGENTS.md`
 1. Role prompts under `~/.codex/agents/`
-1. Workflow contracts and references under `~/.codex/docs/workflow/` and `~/.codex/rules/`
+1. Workflow contracts and references under repo `docs/workflow/` and `~/.codex/rules/`
 1. Skill instructions loaded for the current task
 
 If two rules conflict at the same level, choose the safer behavior and record the assumption in the final report.
@@ -50,10 +50,7 @@ Use this default flow for non-trivial work:
 1. Orchestrator inspects scope, risk, dependencies, and likely write sets.
 1. Planner produces a schema-valid work plan when decomposition is not trivial.
 1. When the user explicitly requests child-agent delegation, orchestrator may emit read-only task packets with an empty `write_set` for analysis, review, or test assistance.
-1. Main thread implements and validates changes locally using `~/.codex/rules/implementation-standards.md`.
-1. Reviewer performs an independent defect and regression pass, including responsibility-boundary and knowledge-duplication checks.
-1. Tester runs the validation loop and classifies failures.
-1. Summarizer produces the final user-facing report.
+1. Execute the shared queue and validation loop from repo `docs/workflow/`, with Codex-specific ownership rules applied through the adapter prompts and `~/.codex/rules/workflow-loop.md`.
 
 Delegation exceptions are allowed only when the task is trivial, no useful read-only sub-agent capability exists, or decomposition would add more risk than value. The final report must state why delegation was skipped.
 
@@ -100,9 +97,9 @@ ______________________________________________________________________
 ## 6. Layout
 
 - `~/.codex/agents/`: role prompts
-- `~/.codex/docs/workflow/`: schemas, templates, and workflow contracts
+- repo `docs/workflow/`: canonical workflow contracts and policies
 - `~/.codex/rules/`: reusable cross-cutting references
 - `~/.codex/rules/implementation-standards.md`: shared implementation rules for main-thread edits and verification
 - `~/.codex/skills/`: optional task-local skills loaded through the skill adapter rules
 
-This file is intentionally small. Put role behavior in role prompts and reusable detail in references.
+This file is intentionally small. Keep workflow semantics in `docs/workflow/`, Codex runtime constraints in adapter prompts, and reusable detail in `~/.codex/rules/`.

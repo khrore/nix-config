@@ -2,48 +2,25 @@
 
 - Audience: Workflow agents under this directory.
 - Purpose: Shared context and quality-of-life conventions for clean handoffs.
-- Scope: Coordination guidance only. Role behavior and routing rules live in each agent file.
+- Scope: Coordination guidance only. Canonical workflow semantics live in repo `docs/workflow/`.
 
 ---
 
-## 1) What this file is (and is not)
+## 1) Canonical Sources
 
-Use this file as a lightweight playbook to keep stage outputs consistent and easy to consume.
+Use this file to keep stage handoffs compact and consistent.
 
-This file does not replace:
+Authoritative references:
 
-- `workflow-orchestrator.md` for automatic queue control and loop routing by the workflow orchestrator
-- stage prompts (`analyzer`, `researcher`, `planner`, `coder`, `reviewer`, `tester`, `technical-writer`, `summarizer`) for role-specific rules
-- workflow docs in `docs/workflow/` for canonical schema and policy definitions
-- parent `../AGENTS.md` for shared engineering standards
+- repo `docs/workflow/` for queue, ownership, escalation, skip policy, packets, and failure taxonomy
+- parent `../AGENTS.md` for shared engineering standards and reporting requirements
+- runtime-specific agent prompts for OpenCode tool and ownership behavior
 
-If there is a conflict, follow the shared workflow docs first, then the stage prompt, then this playbook.
-
----
-
-## 2) Workflow orientation (quick map)
-
-Default queue:
-
-`analyzer -> researcher -> planner -> coder -> reviewer -> tester -> technical-writer -> summarizer`
-
-Workflow operating model:
-
-- the workflow orchestrator automatically handles decomposition, spawn decisions, and result merging
-- child agents should receive validated task packets from `docs/workflow/`
-- `fork_context=false` is the default unless a narrow follow-up requires inherited context
-
-Common loop:
-
-- reviewer returns `changes_required`
-- route back to the same coder with actionable `fix_instructions`
-- repeat until approved or review-cycle limit is reached
-
-Escalation is context-driven via workflow settings (for example `escalation_policy`, `max_review_cycles`).
+If there is a conflict, follow the workflow docs first, then the stage prompt, then this playbook.
 
 ---
 
-## 3) Handoff quality defaults
+## 2) Handoff Quality Defaults
 
 Every handoff should be easy for the next stage to execute without guessing.
 
@@ -65,7 +42,7 @@ Recommended status vocabulary:
 
 ---
 
-## 4) Escalation communication style
+## 3) Escalation Communication
 
 When asking a human question, keep it decision-ready:
 
@@ -78,7 +55,7 @@ Avoid broad or multi-part questions that delay routing.
 
 ---
 
-## 5) Reviewer -> coder remediation quality
+## 4) Remediation Quality
 
 `fix_instructions` should be actionable and verifiable.
 
@@ -105,7 +82,7 @@ Example, bad:
 
 ---
 
-## 6) Stage collaboration etiquette
+## 5) Collaboration Etiquette
 
 - Respect prior stage decisions unless new evidence shows risk or contradiction.
 - Do not re-scope the task without a concrete reason.
@@ -117,62 +94,7 @@ Example, bad:
 
 ---
 
-## 7) Practical checklists (non-binding reminders)
-
-Analyzer:
-
-- restate objective clearly
-- list assumptions and constraints
-- define acceptance criteria and risk framing
-
-Researcher:
-
-- map relevant files and systems
-- capture existing patterns and constraints
-- flag unknowns that affect plan viability
-
-Planner:
-
-- produce executable steps
-- align validation depth with risk
-- choose appropriate child-agent path
-- split into bounded work items with clear ownership and dependencies
-
-Coder:
-
-- implement only approved scope
-- keep changes focused and reversible
-- report exactly what changed
-- run the packet-defined self-repair loop before handoff
-
-Reviewer:
-
-- decide: approved, changes_required, or blocked
-- provide concrete remediation when not approved
-- include acceptance checks for each fix item
-- review the result against the task packet, not against the whole thread
-
-Tester:
-
-- validate behavior and failure paths
-- separate pass/fail from confidence notes
-- report residual risk when coverage is partial
-
-Technical writer:
-
-- update impacted docs only
-- keep docs concise and task-scoped
-- no-op explicitly when docs impact is zero
-
-Summarizer:
-
-- produce structured and human summaries
-- include validation, assumptions, and residual risks
-- clearly mark skipped stages and reasons
-
----
-
-## 8) Token and readability hygiene
+## 6) Token And Readability Hygiene
 
 - Prefer compact, high-signal outputs.
 - Avoid repeating unchanged context from earlier stages.

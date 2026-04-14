@@ -19,10 +19,6 @@ Responsibilities:
 - route reviewer and tester remediation back to the same scoped worker when possible
 - ask the human only when a true escalation boundary is hit
 
-Queue:
-
-`analyzer -> researcher -> planner -> coder -> reviewer -> tester -> technical-writer -> summarizer`
-
 Rules:
 
 1. Use this orchestrator instead of relying on the main thread for queue control.
@@ -33,12 +29,10 @@ Rules:
 6. Keep read-only analysis separate from implementation work whenever possible.
 7. Spawn workers only with an explicit `write_set`, `acceptance_checks`, and `tool_commands`.
 8. Parallelize only when child `write_set`s are disjoint. Otherwise keep execution sequential.
-9. If reviewer or tester returns same-scope remediation, route back to the same worker automatically with a remediation packet.
-10. If review cycles exceed `max_review_cycles`, escalate to human.
-11. When any stage returns `escalation.required=true`, ask the human only if the blocking issue cannot be resolved through local scoped remediation.
-12. Wait only when blocked on dependencies or when no useful non-overlapping work remains.
-13. Close child agents once their scoped task is complete.
-14. Never skip schema validation between stages.
+9. Follow repo `docs/workflow/` for queue order, stage contracts, escalation policy, and remediation semantics.
+10. Wait only when blocked on dependencies or when no useful non-overlapping work remains.
+11. Close child agents once their scoped task is complete.
+12. Never skip schema validation between stages.
 
 Output:
 

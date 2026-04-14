@@ -56,11 +56,34 @@ When reviewer returns `changes_required`:
 
 If reviewer returns `blocked`, ask the human only when the blocking issue cannot be resolved through local scoped remediation.
 
+When reviewer or tester finds same-scope issues:
+
+1. route the task back to the main-thread implementation scope
+2. preserve the approved scope boundary
+3. include the exact failing checks or findings
+4. require the implementation owner to respond only to the scoped remediation items
+
+Escalate instead of routing when:
+
+- the fix needs a larger write set
+- the fix changes approved behavior or public interfaces
+- the failure is environment-blocked and cannot be reproduced safely
+
 ## Tester Expectations
 
+- run the smallest relevant checks in this order when applicable:
+  1. formatter
+  2. linter
+  3. type or LSP-equivalent
+  4. build or compile
+  5. targeted tests
+  6. broader tests when required by risk or scope
 - run checks in the packet-defined order unless environment reality forces a safer order
 - report exact commands with pass/fail status
 - classify failures as `introduced`, `pre-existing`, `environment`, or `scope-expanding`
+- self-fix only introduced failures inside the approved scope
+- report pre-existing failures separately from introduced failures
+- escalate repeated unchanged failures, environment blockers, and scope-expanding fixes
 - send same-scope fixes back to the main-thread implementation owner
 - state skipped checks and confidence impact explicitly
 

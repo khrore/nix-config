@@ -2,7 +2,7 @@
 
 Use this reference for TypeScript, Python, and general-routed tasks during planning, implementation, and review. These are design-selection rules, not formatting rules.
 
-Rust-routed tasks continue to use `dotfiles/common/.codex/rules/rust-design-standards.md` as their primary standards source. This file translates the same design intent into cross-language guidance without forcing Rust syntax or object-oriented structure onto other languages.
+Rust-routed tasks continue to use `dotfiles/common/.codex/rules/rust-design-standards.md` as their primary standards source.
 
 ## Profiles
 
@@ -17,226 +17,56 @@ Available non-Rust `standards_profile.profile_name` values:
 
 Do not invent new non-Rust profile names. Choose the closest profile for the task and record any exceptions in `deviations_allowed`.
 
-Each applied rule should be recorded in `standards_profile.applied_rules` by rule id.
-
-## Rust-to-Cross-Language Translation
-
-Apply Rust design ideas by intent:
-
-- ownership and borrowing -> minimize aliasing and shared mutation; prefer `readonly`, pure helpers, deliberate copies, and narrow mutation scope
-- newtypes -> prefer branded or opaque types in TypeScript and `NewType`, value objects, or small dataclasses in Python when semantics matter
-- traits over inheritance -> prefer interfaces and discriminated unions in TypeScript, or `Protocol` and narrow ABCs in Python
-- RAII -> use `try/finally`, `using`, or disposables in TypeScript when available; use context managers in Python
-- `Result` and explicit error models -> use discriminated unions for expected failures in TypeScript and explicit exception taxonomies or result objects in Python
-- builders -> use only when staged validation or many optional fields justify them; otherwise prefer options objects in TypeScript and keyword arguments in Python
-
-## Rules
+## Core Rules
 
 ### `single-reason-to-change`
 
-Intent:
-
-- Keep each module, component, class, or function aligned to one actor or one cohesive reason to change.
-
-Apply when:
-
-- a unit mixes policy, I/O, formatting, persistence, and orchestration responsibilities
-- a change request would otherwise force unrelated edits into the same unit
-
-Avoid when:
-
-- splitting would create wrappers with no meaningful boundary or clarity gain
-
-TypeScript mapping:
-
-- split controllers, services, data mappers, and presenters instead of building multipurpose classes
-- prefer narrow modules and hooks over components that fetch, transform, render, and persist at once
-
-Python mapping:
-
-- separate orchestration, domain logic, and adapters instead of large utility modules or god classes
-- prefer focused functions or small dataclasses over stateful managers with mixed concerns
-
-General mapping:
-
-- for Nix, shell, and config tasks, keep one file or module responsible for one concern or decision surface
-
-Reviewer should flag:
-
-- units that serve multiple unrelated actors or combine policy with infrastructure without a clear reason
-
-### `composition-over-hierarchy`
-
-Intent:
-
-- Reuse behavior by wiring smaller parts together instead of depending on deep inheritance trees or implicit reuse.
-
-Apply when:
-
-- behavior varies by strategy, policy, adapter, or mode
-- subclassing would leak assumptions or require fragile overrides
-
-Avoid when:
-
-- the language or framework already provides a narrow, conventional extension point that is simpler than composition
-
-TypeScript mapping:
-
-- prefer interfaces, discriminated unions, injected collaborators, and component composition over inheritance-heavy class trees
-
-Python mapping:
-
-- prefer delegation, protocols, callables, and composition over subclass pyramids and mixin stacks
-
-General mapping:
-
-- compose scripts, modules, and config fragments through explicit inputs and helpers instead of coupling behavior through hidden inheritance analogs
-
-Reviewer should flag:
-
-- inheritance or reuse schemes that make behavior implicit, surprising, or hard to swap
+- Keep each module, component, class, or function aligned to one cohesive reason to change.
+- Split units that mix policy, I/O, formatting, persistence, and orchestration unless doing so would only add wrappers with no clarity gain.
+- Reviewer should flag modules that serve unrelated actors or combine policy with infrastructure without a clear reason.
 
 ### `dry-knowledge-source`
 
-Intent:
-
-- Keep each piece of business or operational knowledge in one authoritative place.
-
-Apply when:
-
-- validation, defaults, enum alternatives, parsing rules, or command wiring are duplicated
-
-Avoid when:
-
-- deduplication would create an abstraction that is harder to understand than the repeated code
-
-TypeScript mapping:
-
-- centralize schemas, discriminated union members, parsing helpers, and shared domain logic
-
-Python mapping:
-
-- centralize validators, constants, normalization logic, and error messages that encode domain rules
-
-General mapping:
-
-- keep host lists, feature toggles, package selections, and environment mappings in one obvious source
-
-Reviewer should flag:
-
-- duplicated domain rules, repeated variant lists, or copy-pasted branching that can drift
+- Keep each rule, default, enum list, parser, or operational mapping in one authoritative place.
+- Deduplicate only when the abstraction stays clearer than the repetition.
+- Reviewer should flag repeated domain rules, variant lists, and branching that can drift.
 
 ### `simple-solutions-first`
 
-Intent:
-
-- Prefer the simplest solution that satisfies the current requirements and preserves room for later extension.
-
-Apply when:
-
-- multiple designs are possible and one introduces speculative layers, abstractions, or indirection
-
-Avoid when:
-
-- a slightly richer abstraction is necessary to make failure handling, testing, or boundaries explicit
-
-TypeScript mapping:
-
-- prefer plain functions, objects, and simple component boundaries before adding factories, decorators, or class hierarchies
-
-Python mapping:
-
-- prefer straightforward functions, modules, and dataclasses before frameworks, metaclasses, or dynamic indirection
-
-General mapping:
-
-- choose the smallest structure that keeps behavior explicit and maintainable
-
-Reviewer should flag:
-
-- speculative abstractions, premature plugin systems, or indirection with no current payoff
-
-### `local-collaboration-boundaries`
-
-Intent:
-
-- Keep modules talking to direct collaborators and stable interfaces rather than reaching deeply through object graphs or nested structures.
-
-Apply when:
-
-- a unit depends on chains of internal structure or hidden transit paths to do its work
-
-Avoid when:
-
-- flattening access would only add wrappers without reducing coupling
-
-TypeScript mapping:
-
-- pass in the data or collaborator actually needed instead of chaining through nested services or props
-
-Python mapping:
-
-- avoid long attribute access chains and broad reach-through into nested objects when a narrower boundary would suffice
-
-General mapping:
-
-- prefer direct inputs over hidden global reads or multi-hop lookups through unrelated layers
-
-Reviewer should flag:
-
-- deep reach-through such as train-wreck calls, chained property access into internals, or helpers that know too much about nested structure
+- Prefer the smallest structure that satisfies current requirements without speculative layers.
+- Add indirection only when it improves boundaries, failure handling, or testability.
+- Reviewer should flag premature plugin systems, abstraction stacks, or indirection with no current payoff.
 
 ### `explicit-contracts`
 
-Intent:
+- Make inputs, outputs, invariants, and failure modes visible at the boundary.
+- Use precise types, validation, and explicit error handling where invalid input or partial success matters.
+- Reviewer should flag silent fallback behavior, ambiguous return shapes, and hidden invariants.
 
-- Make preconditions, postconditions, invariants, and failure modes visible at the boundary.
+### `local-collaboration-boundaries`
 
-Apply when:
+- Keep modules talking to direct collaborators and stable interfaces instead of reaching deeply through nested structure.
+- Prefer direct inputs over hidden globals or multi-hop lookups.
+- Reviewer should flag reach-through access patterns and helpers that know too much about internal structure.
 
-- invalid input, partial success, or invariants could otherwise be inferred only from implementation details
+## Language Mapping
 
-Avoid when:
+TypeScript:
 
-- the boundary is purely private and additional ceremony would duplicate already obvious local code
+- prefer interfaces, discriminated unions, and composition over deep class trees
+- prefer narrow modules and hooks over components that fetch, transform, render, and persist at once
+- use readonly data and explicit result or error shapes when behavior depends on boundary guarantees
 
-TypeScript mapping:
+Python:
 
-- use precise types, schema validation, discriminated unions, assertions, and documented return contracts
+- prefer focused functions, dataclasses, protocols, and composition over broad utility modules or mixin-heavy hierarchies
+- separate orchestration, domain logic, and adapters when they change for different reasons
+- use explicit exception or result models when callers need predictable failure handling
 
-Python mapping:
+General:
 
-- use type hints, validation, dataclass invariants, explicit exceptions, and narrow public method contracts
-
-General mapping:
-
-- define expected inputs, outputs, invariants, and side effects in the module or command surface itself
-
-Reviewer should flag:
-
-- ambiguous return shapes, silent fallback behavior, missing validation at boundaries, or hidden invariants
-
-### `encapsulated-state`
-
-Intent:
-
-- Keep mutable state and implementation details behind a small, intentional API.
-
-Apply when:
-
-- callers can directly mutate internal structures or depend on representation details
-
-Avoid when:
-
-- the data is intentionally a plain transport object with no behavioral invariants
-
-TypeScript mapping:
-
-- expose readonly views, narrow update methods, and helper functions instead of leaking mutable internals
-
-Python mapping:
-
-- keep internal state private by convention, expose narrow methods or properties, and avoid letting callers mutate internal containers directly
+- for shell, Nix, and configuration-heavy work, keep one file or module responsible for one concern or decision surface
+- prefer explicit inputs, obvious defaults, and the least surprising wiring
 
 General mapping:
 

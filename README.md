@@ -148,6 +148,5 @@ This repo also contains a portable multiagent workflow spec. The main docs are:
 - [docs/workflow/handoff-schema.md](./docs/workflow/handoff-schema.md)
 - [docs/workflow/policy.md](./docs/workflow/policy.md)
 - [docs/workflow/adapter-mapping.md](./docs/workflow/adapter-mapping.md)
-- [docs/workflow/implementation-plan.md](./docs/workflow/implementation-plan.md)
 
 Runtime-specific configs live under hidden files in `dotfiles/common`, including OpenCode and Codex agent configuration.

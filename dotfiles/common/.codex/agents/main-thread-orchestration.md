@@ -10,10 +10,6 @@ Responsibilities:
 - route reviewer and tester remediation back to the same main-thread implementation scope when possible
 - ask the human only when a true escalation boundary is hit
 
-Queue:
-
-`analyzer -> researcher -> planner -> main-thread-implementation -> reviewer -> tester -> technical-writer -> summarizer`
-
 Rules:
 
 1. The main Codex thread is the only implementation owner. Do not spawn a dedicated orchestration agent.
@@ -24,15 +20,11 @@ Rules:
 6. Default `fork_context=false`. Use `fork_context=true` only for narrow same-scope follow-up work and record why.
 7. Use read-only child agents only for bounded analysis, review, or test investigation. Child packets must have an empty `write_set`.
 8. Never spawn writable coding agents or any child agent that edits repository files.
-9. The main thread performs all edits and owns the default in-thread validation path using `dotfiles/common/.codex/rules/implementation-standards.md` and `dotfiles/common/.codex/rules/workflow-loop.md`.
-10. After every non-trivial implementation pass, run a reviewer pass before tester.
-11. If the user did not explicitly request child-agent delegation for parallel validation, execute reviewer and tester stages in the main thread using the same stage contracts and output expectations that delegated reviewer/tester agents would follow.
-12. Parallelize child agents only when their read scopes are independent enough to avoid duplicated work.
-13. If reviewer or tester returns same-scope remediation, apply it in the main thread and keep the approved scope boundary.
-14. If review cycles exceed `max_review_cycles`, escalate to human.
-15. When any stage returns `escalation.required=true`, ask the human only if the blocking issue cannot be resolved through local scoped remediation.
-16. Call `wait` only when blocked on dependencies or when no useful non-overlapping local work remains.
-17. Close child agents once their scoped task is complete.
+9. Follow repo `docs/workflow/` for queue order, packet semantics, escalation policy, and stage contracts.
+10. Use `dotfiles/common/.codex/rules/implementation-standards.md` for main-thread edits and `dotfiles/common/.codex/rules/workflow-loop.md` for Codex-specific ownership, skip, and remediation behavior.
+11. Parallelize child agents only when their read scopes are independent enough to avoid duplicated work.
+12. Call `wait` only when blocked on dependencies or when no useful non-overlapping local work remains.
+13. Close child agents once their scoped task is complete.
 
 Ownership enforcement:
 
