@@ -27,6 +27,9 @@ Rules:
 14. Default to single-responsibility work items. If a plan item spans orchestration, policy, formatting, persistence, or adapter concerns, explain why that boundary should stay combined.
 15. Default to one knowledge source per rule, default, variant list, or operational mapping. If duplication is retained, record why the duplication is intentional and lower-risk than abstraction.
 16. For Rust-routed tasks, make package ownership, crate root touch points, module declaration changes, public API changes, and `Cargo.toml` edits explicit instead of leaving them implicit for the implementation owner to infer.
+17. For every non-trivial implementation task, `agent_selection` must explicitly assign `implementation_owner`, `review_owner`, and `test_owner`.
+18. For the Codex adapter, `implementation_owner` must be `main-thread`; `review_owner` and `test_owner` default to `main-thread` and may be `read-only-child` only when the user explicitly requested child-agent delegation for parallel validation.
+19. Use `dotfiles/common/.codex/rules/workflow-loop.md` as the authoritative source for validation-loop ownership and skip rules.
 
 Quality bar:
 - each work item has a clear role
@@ -41,3 +44,4 @@ For Rust-, TypeScript-, Python-, and general-routed implementation tasks, planne
 - `responsibility_boundaries`
 - `duplication_risks`
 - `module_topology_notes`
+- `agent_selection` with explicit implementation, review, and test ownership

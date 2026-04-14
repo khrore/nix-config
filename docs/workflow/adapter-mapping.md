@@ -44,7 +44,7 @@
 | run_checks | shell tool command allowlists, typically in the main thread |
 | external_read | web/read-only integration access |
 | external_write | integration mutation permissions with gate |
-| orchestrate_subagents | read-only subagent task invocation API on explicit user request |
+| orchestrate_subagents | read-only subagent task invocation API only when the user explicitly requests child-agent delegation |
 
 ## Capability to Claude Runtime
 
@@ -63,8 +63,9 @@
 | Rule | OpenCode | Codex | Claude |
 |---|---|---|---|
 | fixed queue | `permission.task` + orchestrator prompt | orchestrator router + read-only child allowlist + main-thread implementation owner | agent policy + allowed child list |
-| reviewer loop | payload `review_cycle_count` | session state counter | session state counter |
+| reviewer loop | payload `review_cycle_count` | session state counter + main-thread default reviewer/tester execution | session state counter |
 | max cycles | workflow config override | workflow config override | workflow config override |
 | escalation | `escalation_policy` in payload | same | same |
-| hidden orchestrator | `hidden: true` | internal-only marker | hidden/internal config |
+| orchestrator visibility | `orchestrator_visibility: hidden` + runtime-specific hidden flag | internal-only marker honoring `orchestrator_visibility` | hidden/internal config honoring `orchestrator_visibility` |
 | language standards | shared `standards_profile` payload + shared standards references | same | same |
+| ownership assignment | shared packet uses `primary-runtime` / `delegated-agent` / `read-only-helper`; runtime maps values to native execution model | `primary-runtime -> main-thread`; `read-only-helper -> read-only-child`; `implementation_owner` must stay `primary-runtime` | runtime policy maps shared ownership values to native execution model |

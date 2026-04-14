@@ -17,6 +17,7 @@ This file does not replace:
 - workflow docs in `docs/workflow/` for canonical schema and policy definitions
 - parent `../AGENTS.md` for shared engineering standards
 - `../rules/implementation-standards.md` for main-thread implementation rules
+- `../rules/workflow-loop.md` for validation-loop ownership, skip, and remediation rules
 
 If there is a conflict, follow the shared workflow docs first, then the stage prompt, then this playbook.
 
@@ -30,9 +31,9 @@ Default queue:
 
 Codex operating model:
 
-- the main Codex thread handles decomposition, edits, validation, and result merging
+- the main Codex thread handles decomposition, edits, the default in-thread validation path, and result merging
 - child agents are read-only and should receive validated task packets from `docs/workflow/`
-- spawn child agents only when the user explicitly requests delegation
+- spawn child agents only when the user explicitly requests child-agent delegation
 - child agents must have an empty `write_set`
 - `fork_context=false` is the default unless a narrow follow-up requires inherited context
 
@@ -41,6 +42,8 @@ Common loop:
 - reviewer returns `changes_required`
 - route back to the main thread implementation owner with actionable `fix_instructions`
 - repeat until approved or review-cycle limit is reached
+
+The detailed ownership, skip, and remediation rules live in `../rules/workflow-loop.md`; do not restate or override them here.
 
 Escalation is context-driven via workflow settings (for example `escalation_policy`, `max_review_cycles`).
 
@@ -145,6 +148,7 @@ Planner:
 Main-thread implementation:
 
 - follow `../rules/implementation-standards.md`
+- follow `../rules/workflow-loop.md`
 - implement only approved scope
 - keep changes focused and reversible
 - report exactly what changed

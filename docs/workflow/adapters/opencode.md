@@ -8,7 +8,7 @@
 
 ## Key Controls
 
-- `workflow-orchestrator` has `hidden: true`
+- `workflow-orchestrator` honors `orchestrator_visibility: hidden` via `hidden: true`
 - each stage can invoke only allowed next stages
 - web fetch read access is globally allowed
 - write/mutation behavior remains policy-gated by role and workflow state

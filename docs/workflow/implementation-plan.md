@@ -69,7 +69,7 @@ Validation checks:
 ## Final Acceptance Criteria
 
 - user-defined `escalation_policy` at workflow creation is supported
-- hidden orchestrator default is enforced
+- `orchestrator_visibility: hidden` default is enforced
 - external read-only requests are allowed
-- reviewer-to-coder remediation loop is active with max cycle limit
+- reviewer-to-implementation-owner remediation loop is active with max cycle limit
 - workflow is not coupled to OpenCode internals due to adapter-based design

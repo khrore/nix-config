@@ -9,7 +9,7 @@
 ## Goal
 
 Use a context-driven agent workflow with explicit handoff contracts, controlled escalation,
-language-aware coding/review, and a deterministic reviewer-to-coder remediation loop.
+language-aware coding/review, and a deterministic reviewer-to-implementation remediation loop.
 
 ## Stage Queue
 
@@ -21,6 +21,13 @@ language-aware coding/review, and a deterministic reviewer-to-coder remediation 
 6. tester
 7. technical-writer
 8. summarizer
+
+## Runtime Ownership Notes
+
+- The abstract workflow queue remains runtime-neutral.
+- Runtime adapters may map abstract `coder`, `reviewer`, and `tester` stages onto different execution models while preserving the same stage contracts.
+- In the Codex adapter, `coder` maps to `main-thread-implementation` and review/test default to in-thread execution by the main Codex thread.
+- In the Codex adapter, reviewer and tester child agents are optional read-only helpers and may be used only when the user explicitly requests child-agent delegation for parallel validation.
 
 ## Language Routing
 
@@ -48,7 +55,7 @@ For tasks routed to `rust-coder`, the researcher and planner should also bind cr
 [Workflow Settings]
 - escalation_policy: strict | balanced | relaxed
 - max_review_cycles: N (default 3)
-- orchestrator_hidden: true
+- orchestrator_visibility: hidden
         |
         v
 [workflow-orchestrator]
@@ -120,7 +127,7 @@ If reviewer is not satisfied:
 
 1. reviewer sets `review_outcome: changes_required`
 2. reviewer provides `fix_instructions[]`
-3. orchestrator routes back to same coder
+3. orchestrator routes back to the same implementation owner
 4. loop increments `review_cycle_count`
 5. if `review_cycle_count > max_review_cycles`, escalate to human
 
@@ -141,6 +148,31 @@ Summarizer always reports skipped stages and reasons.
 - enforce policy with adapter-specific permissions
 - keep handoff payload stable across runtimes
 - keep language standards in shared references and packet fields, not runtime-only prompt drift
+- require explicit ownership for implementation, review, and testing on non-trivial implementation work
+
+## Planner Ownership Assignment
+
+For every non-trivial implementation task, planner output must assign ownership for:
+
+- `implementation_owner`
+- `review_owner`
+- `test_owner`
+
+Use runtime-neutral ownership values in the shared packet:
+
+- `primary-runtime`
+- `delegated-agent`
+- `read-only-helper`
+
+Adapter defaults may narrow the allowed values and map them to runtime-native concepts.
+
+For the Codex adapter:
+
+- `implementation_owner` must be `primary-runtime`
+- `review_owner` defaults to `primary-runtime`
+- `test_owner` defaults to `primary-runtime`
+- `review_owner` or `test_owner` may be `read-only-helper` only when the user explicitly requested child-agent delegation for parallel validation
+- the Codex runtime maps `primary-runtime` to `main-thread` and `read-only-helper` to `read-only-child`
 
 ## Design Standards Flow
 

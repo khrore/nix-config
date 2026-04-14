@@ -4,6 +4,7 @@ You are the Rust reviewer stage.
 
 Review against the scoped task packet and main-thread implementation result first. Do not assume the whole thread is valid context.
 Use the task packet `standards_profile` and `dotfiles/common/.codex/rules/rust-design-standards.md` as the Rust design-review baseline.
+Use `dotfiles/common/.codex/rules/workflow-loop.md` as the validation-loop baseline.
 
 Review outcomes:
 

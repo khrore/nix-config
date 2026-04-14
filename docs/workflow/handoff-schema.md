@@ -28,6 +28,7 @@ In the Codex adapter, the same `standards_profile` requirement applies when impl
 
 ## Optional Global Fields
 
+- `agent_selection`
 - `standards_profile`
 - `module_topology_notes`
 
@@ -73,6 +74,36 @@ Include this worker-result object whenever `standards_profile` is bound.
 - `repo_overrides_followed` (array of strings)
 - `deviations_used` (array of strings)
 
+## `agent_selection` Object
+
+Planner output must document execution ownership inside `agent_selection`.
+
+Required fields for non-trivial implementation work:
+
+- `implementation_owner`
+- `review_owner`
+- `test_owner`
+
+Recommended values:
+
+- `primary-runtime`
+- `delegated-agent`
+- `read-only-helper`
+
+Value meanings:
+
+- `primary-runtime`: run the stage in the runtime's default execution context
+- `delegated-agent`: run the stage in a delegated agent that can own the stage outcome for runtimes that allow it
+- `read-only-helper`: use a delegated read-only helper that reports back to the primary implementation owner
+
+Codex adapter constraints:
+
+- `implementation_owner` must be `primary-runtime`
+- `review_owner` defaults to `primary-runtime`
+- `test_owner` defaults to `primary-runtime`
+- `review_owner` or `test_owner` may be `read-only-helper` only when the user explicitly requested child-agent delegation for parallel validation
+- the Codex runtime maps `primary-runtime` to `main-thread` and `read-only-helper` to `read-only-child`
+
 ## Stage Specific Required Fields
 
 - analyzer:
@@ -86,6 +117,7 @@ Include this worker-result object whenever `standards_profile` is bound.
   - `execution_plan`
   - `validation_plan`
   - `agent_selection`
+  - `agent_selection` must assign `implementation_owner`, `review_owner`, and `test_owner` for non-trivial implementation work
   - include bound `standards_profile` when the selected agent is `rust-coder`, `typescript-coder`, `python-coder`, or `general-coder`
   - for Rust-routed tasks, include `module_topology_notes` covering package ownership, crate roots, parent module declarations, public API touch points, and manifest implications
 - coder:
@@ -98,10 +130,12 @@ For the Codex adapter, the `coder` stage fields double as the main-thread implem
   - `review_outcome` (`approved | changes_required | blocked`)
   - `fix_instructions`
   - `severity_summary`
+  - in the Codex adapter, reviewer may execute in the main thread using the same stage contract, or in a read-only child agent when the user explicitly requested child-agent delegation for parallel validation
 - tester:
   - `test_results`
   - `coverage_notes`
   - `confidence`
+  - in the Codex adapter, tester may execute in the main thread using the same stage contract, or in a read-only child agent when the user explicitly requested child-agent delegation for parallel validation
 - technical-writer:
   - `docs_changed`
   - `user_impact`
@@ -135,6 +169,11 @@ Each item must include:
   "open_questions": [],
   "next_agent": "typescript-coder",
   "review_cycle_count": 1,
+  "agent_selection": {
+    "implementation_owner": "primary-runtime",
+    "review_owner": "primary-runtime",
+    "test_owner": "primary-runtime"
+  },
   "standards_profile": {
     "language": "typescript",
     "profile_name": "service-backend",
