@@ -3,8 +3,8 @@
 - Audience: all Codex threads and spawned agents.
 - Scope: global execution policy, safety invariants, delegation defaults, and reporting requirements.
 - Philosophy: small context, explicit contracts, independent verification, reversible changes.
-- Version: 3.1.1
-- Last Updated: 2026-04-13
+- Version: 3.1.2
+- Last Updated: 2026-04-17
 
 ______________________________________________________________________
 
@@ -35,6 +35,7 @@ These rules apply to every task unless a higher-precedence instruction overrides
 1. Make small, reversible changes. Avoid unrelated edits and speculative refactors.
 1. Prefer single responsibility boundaries. Modules, files, functions, and agents should have one cohesive reason to change; split orchestration, policy, and I/O when they start moving for different reasons.
 1. Prefer one authoritative knowledge source. Keep shared rules, defaults, variant lists, and operational logic in one obvious place; deduplicate repeated knowledge unless the abstraction would reduce clarity more than the repetition.
+1. Keep `AGENTS.md` fresh. When changing Codex dotfiles, prompts, rules, or workflow adapters, update this file if the operating guidance or repo map changed.
 1. Never silently swallow failures. Errors must say what failed and where.
 1. Never log secrets or raw sensitive payloads.
 1. Never run destructive git commands unless the user explicitly asks.
