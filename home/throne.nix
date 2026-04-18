@@ -10,6 +10,11 @@ let
   isDarwin = mylib.isDarwin system;
   jq = lib.getExe pkgs.jq;
   homeDir = config.home.homeDirectory;
+  throneConfigDir =
+    if isDarwin then
+      "${homeDir}/Library/Preferences/Throne/config"
+    else
+      "${homeDir}/.config/Throne/config";
 
   directCidrs = [
     "10.0.0.0/8"
@@ -131,50 +136,50 @@ let
     current_route_id = 0;
   };
 in
-lib.mkIf isDarwin {
+{
   home.activation.configureThroneRouting = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-    throne_config_dir="${homeDir}/Library/Preferences/Throne/config"
-    throne_route_dir="$throne_config_dir/route_profiles"
-    throne_profile_path="$throne_route_dir/0.json"
-    throne_route_settings_path="$throne_route_dir/Default"
-    throne_configs_path="$throne_config_dir/configs.json"
+        throne_config_dir="${throneConfigDir}"
+        throne_route_dir="$throne_config_dir/route_profiles"
+        throne_profile_path="$throne_route_dir/0.json"
+        throne_route_settings_path="$throne_route_dir/Default"
+        throne_configs_path="$throne_config_dir/configs.json"
 
-    mkdir -p "$throne_route_dir"
+        mkdir -p "$throne_route_dir"
 
-    write_if_changed() {
-      local target_path tmp_path
+        write_if_changed() {
+          local target_path tmp_path
 
-      target_path="$1"
-      tmp_path="$2"
+          target_path="$1"
+          tmp_path="$2"
 
-      if [ ! -f "$target_path" ] || ! cmp -s "$tmp_path" "$target_path"; then
-        mv "$tmp_path" "$target_path"
-        echo "Updated Throne routing file: $target_path"
-      else
-        rm -f "$tmp_path"
-      fi
-    }
+          if [ ! -f "$target_path" ] || ! cmp -s "$tmp_path" "$target_path"; then
+            mv "$tmp_path" "$target_path"
+            echo "Updated Throne routing file: $target_path"
+          else
+            rm -f "$tmp_path"
+          fi
+        }
 
-    tmp_profile="$(mktemp)"
-    cat > "$tmp_profile" <<'EOF'
-${managedDefaultProfile}
-EOF
-    write_if_changed "$throne_profile_path" "$tmp_profile"
+        tmp_profile="$(mktemp)"
+        cat > "$tmp_profile" <<'EOF'
+    ${managedDefaultProfile}
+    EOF
+        write_if_changed "$throne_profile_path" "$tmp_profile"
 
-    tmp_route_settings="$(mktemp)"
-    if [ -f "$throne_route_settings_path" ]; then
-      ${jq} '.current_route_id = 0' "$throne_route_settings_path" > "$tmp_route_settings"
-    else
-      cat > "$tmp_route_settings" <<'EOF'
-${managedRouteSettings}
-EOF
-    fi
-    write_if_changed "$throne_route_settings_path" "$tmp_route_settings"
+        tmp_route_settings="$(mktemp)"
+        if [ -f "$throne_route_settings_path" ]; then
+          ${jq} '.current_route_id = 0' "$throne_route_settings_path" > "$tmp_route_settings"
+        else
+          cat > "$tmp_route_settings" <<'EOF'
+    ${managedRouteSettings}
+    EOF
+        fi
+        write_if_changed "$throne_route_settings_path" "$tmp_route_settings"
 
-    if [ -f "$throne_configs_path" ]; then
-      tmp_configs="$(mktemp)"
-      ${jq} '.active_routing = "Default"' "$throne_configs_path" > "$tmp_configs"
-      write_if_changed "$throne_configs_path" "$tmp_configs"
-    fi
+        if [ -f "$throne_configs_path" ]; then
+          tmp_configs="$(mktemp)"
+          ${jq} '.active_routing = "Default"' "$throne_configs_path" > "$tmp_configs"
+          write_if_changed "$throne_configs_path" "$tmp_configs"
+        fi
   '';
 }

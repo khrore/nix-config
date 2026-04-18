@@ -7,35 +7,14 @@
 // custom settings, run `zed: open default settings` from the
 // command palette (cmd-shift-p / ctrl-shift-p)
 {
-  "context_servers": {
-    
-  },
+  "context_servers": {},
   "edit_predictions": {
     "provider": "zed",
     "copilot": {
-      "enable_next_edit_suggestions": false
+      "enable_next_edit_suggestions": false,
     },
     "codestral": {
       "max_tokens": 160,
-    },
-  },
-  "agent": {
-    "default_model": {
-      "provider": "ollama",
-      "model": "gpt-oss:20b",
-    },
-    "favorite_models": [],
-    "model_parameters": [],
-  },
-  "agent_servers": {
-    "github-copilot": {
-      "type": "registry",
-    },
-    "opencode": {
-      "type": "registry",
-    },
-    "qwen-code": {
-      "type": "registry",
     },
   },
   "vim_mode": true,
