@@ -1,0 +1,156 @@
+model = "gpt-5.4"
+model_reasoning_effort = "high"
+personality = "pragmatic"
+approval_policy = "on-request"
+approvals_reviewer = "user"
+service_tier = "fast"
+sandbox_mode = "workspace-write"
+
+[agents]
+max_depth = 1
+max_threads = 2
+
+[agents.researcher]
+description = "Read-only research helper for bounded discovery and comparison work."
+config_file = "./roles/researcher.toml"
+
+[agents.reviewer]
+description = "Read-only review helper for bounded correctness and risk inspection."
+config_file = "./roles/reviewer.toml"
+
+[agents.tester]
+description = "Read-only validation helper for bounded verification and failure classification."
+config_file = "./roles/tester.toml"
+
+[projects."/Users/khrore/work/db-ci-cd-template"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/work/platform-web-server"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/work/platform-image-storage"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/work/platform-client-admin"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/work/platform-web-api"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/learn/solana"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/nixos"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/work/platform"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/work/platform-architecture"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/ai/tg-bob"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/ai/tg-bop"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/ai/bot"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/learn/mojo/dlp"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/.docker"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/work/platform-auth"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/.codex"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/work/platform-object-storage"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/work/platform-client"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/work/services-architecture"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/platform/services-architecture"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/platform/architecture"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/platform/annotator"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/platform/code"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/platform"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/platform/auth-client"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/platform/web-api"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/platform/object-storage"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/docs"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/docs/platform-api"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/learn/rust/axum"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/platform/client-admin"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/nix-config"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/projects/dlp"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/learn"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/platform/web-server"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/nixrets"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/platform/server-api"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/notes"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/projects/mojo-ml"]
+trust_level = "trusted"
+
+[projects."/Users/khrore/projects/mojo-explore"]
+trust_level = "trusted"
+
+[notice.model_migrations]
+"gpt-5.3-codex" = "gpt-5.4"
+
+[features]
+multi_agent = true
+memories = true
+
+[sandbox_workspace_write]
+network_access = true
+
+[mcp_servers.openaiDeveloperDocs]
+url = "https://developers.openai.com/mcp"

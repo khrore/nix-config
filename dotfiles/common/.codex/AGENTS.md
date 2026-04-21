@@ -15,8 +15,8 @@ Apply instructions in this order:
 1. Direct user request
 1. Verified environment and repo reality
 1. This `AGENTS.md`
-1. Role prompts under `~/.codex/agents/`
-1. Workflow contracts and references under repo `docs/workflow/` and `~/.codex/rules/`
+1. Native helper role configs under `~/.codex/roles/`
+1. Reusable Codex rules under `~/.codex/rules/`
 1. Skill instructions loaded for the current task
 
 If two rules conflict at the same level, choose the safer behavior and record the assumption in the final report.
@@ -28,14 +28,14 @@ ______________________________________________________________________
 These rules apply to every task unless a higher-precedence instruction overrides them.
 
 1. Inspect before mutation. Read the relevant code, config, or docs before editing.
-1. Keep context small. Load only the global kernel, the active role prompt, and task-relevant references.
-1. Use explicit contracts. Non-trivial delegated work must use schema-valid workflow packets.
-1. Spawn child agents only when the user explicitly requests child-agent delegation. In the Codex runtime, child agents are read-only and must not own edits.
+1. Keep context small. Load only the global kernel, any active role config, and task-relevant references.
+1. Use explicit contracts. Non-trivial delegated work must use a structured, scoped task brief.
+1. Spawn child agents only when the user explicitly requests delegation. In this repo's Codex configuration, child agents are read-only helpers and must not own edits.
 1. Use distinct verification. Main-thread implementation output is not final until reviewed and tested by a distinct stage or distinct verification pass.
 1. Make small, reversible changes. Avoid unrelated edits and speculative refactors.
 1. Prefer single responsibility boundaries. Modules, files, functions, and agents should have one cohesive reason to change; split orchestration, policy, and I/O when they start moving for different reasons.
 1. Prefer one authoritative knowledge source. Keep shared rules, defaults, variant lists, and operational logic in one obvious place; deduplicate repeated knowledge unless the abstraction would reduce clarity more than the repetition.
-1. Keep `AGENTS.md` fresh. When changing Codex dotfiles, prompts, rules, or workflow adapters, update this file if the operating guidance or repo map changed.
+1. Keep `AGENTS.md` fresh. When changing Codex dotfiles, roles, or rules, update this file if the operating guidance or repo map changed.
 1. Never silently swallow failures. Errors must say what failed and where.
 1. Never log secrets or raw sensitive payloads.
 1. Never run destructive git commands unless the user explicitly asks.
@@ -47,11 +47,10 @@ ______________________________________________________________________
 
 Use this default flow for non-trivial work:
 
-1. Main thread acts as orchestrator and implementation owner.
-1. Orchestrator inspects scope, risk, dependencies, and likely write sets.
-1. Planner produces a schema-valid work plan when decomposition is not trivial.
-1. When the user explicitly requests child-agent delegation, orchestrator may emit read-only task packets with an empty `write_set` for analysis, review, or test assistance.
-1. Execute the shared queue and validation loop from repo `docs/workflow/`, with Codex-specific ownership rules applied through the adapter prompts and `~/.codex/rules/workflow-loop.md`.
+1. Main thread owns planning, implementation, and final synthesis.
+1. Main thread inspects scope, risk, dependencies, and likely write sets before delegating.
+1. When the user explicitly requests delegation, the main thread may use native read-only helper roles for bounded analysis, review, or validation assistance.
+1. Delegated helper work must stay scoped, read-only, and subordinate to the main thread.
 
 Delegation exceptions are allowed only when the task is trivial, no useful read-only sub-agent capability exists, or decomposition would add more risk than value. The final report must state why delegation was skipped.
 
@@ -97,10 +96,9 @@ ______________________________________________________________________
 
 ## 6. Layout
 
-- `~/.codex/agents/`: role prompts
-- repo `docs/workflow/`: canonical workflow contracts and policies
+- `~/.codex/roles/`: Codex helper role configs
 - `~/.codex/rules/`: reusable cross-cutting references
 - `~/.codex/rules/implementation-standards.md`: shared implementation rules for main-thread edits and verification
 - `~/.codex/skills/`: optional task-local skills loaded through the skill adapter rules
 
-This file is intentionally small. Keep workflow semantics in `docs/workflow/`, Codex runtime constraints in adapter prompts, and reusable detail in `~/.codex/rules/`.
+This file is intentionally small. Keep repo-level Codex policy here, helper role behavior in `~/.codex/roles/`, and reusable detail in `~/.codex/rules/`.

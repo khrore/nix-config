@@ -7,8 +7,8 @@ Use a skill only when:
 - it adds information or tooling the active role does not already have
 
 Adapter rules:
-1. Orchestrator or planner decides whether a skill is relevant.
-2. Skill use must be represented in the task `context_digest` or packet constraints.
+1. The main thread decides whether a skill is relevant.
+2. Skill use must be represented in the active task brief or context digest.
 3. Load only the skill body and the specific references needed for the task.
-4. Do not copy full skill instructions into role prompts or packets.
+4. Do not copy full skill instructions into role configs or task briefs.
 5. Skills may refine a task, but they do not override higher-precedence policy.

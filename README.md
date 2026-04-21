@@ -10,7 +10,7 @@ Personal multi-host Nix flake for Linux and macOS. It uses Nix for system-level 
 - Shared Home Manager layer in `home`
 - Shared helper library in `lib`
 - Shared and platform-specific dotfiles in `dotfiles`
-- Multiagent workflow docs and runtime configs under `docs/workflow` and hidden files in `dotfiles/common`
+- Runtime configs and hidden agent files under `dotfiles/common`
 
 The flake entrypoint is [flake.nix](./flake.nix). Host definitions are wired into `nixosConfigurations` and `darwinConfigurations`, with common `specialArgs` such as `hostName`, `username`, `system`, `pkgs-unstable`, and `mylib`.
 
@@ -40,7 +40,7 @@ The helper library in [lib/default.nix](./lib/default.nix) provides:
 - Configure a macOS machine with `nix-darwin` defaults and Homebrew apps
 - Install packages and root-related system configuration
 - Link shared dotfiles into `$HOME` independently
-- Provide AI and agent tooling such as `opencode`, `qwen-code`, and workflow runtime files
+- Provide AI and agent tooling such as `opencode`, `qwen-code`, and runtime config files
 
 ## Tooling Included
 
@@ -62,7 +62,6 @@ Highlights:
 - [home](./home): Home Manager entrypoint, package bundles, and dotfile activation
 - [lib](./lib): helper functions used across the flake
 - [dotfiles](./dotfiles): source files linked into the user home directory
-- [docs/workflow](./docs/workflow): multiagent workflow specification and adapter docs
 
 Composition flow:
 
@@ -140,13 +139,6 @@ darwin-rebuild build --flake .#macix
 
 Some evaluation paths may still require access to the private `secrets` flake.
 
-## Multiagent Workflow Files
+## Agent Runtime Files
 
-This repo also contains a portable multiagent workflow spec. The main docs are:
-
-- [docs/workflow/core-spec.md](./docs/workflow/core-spec.md)
-- [docs/workflow/handoff-schema.md](./docs/workflow/handoff-schema.md)
-- [docs/workflow/policy.md](./docs/workflow/policy.md)
-- [docs/workflow/adapter-mapping.md](./docs/workflow/adapter-mapping.md)
-
-Runtime-specific configs live under hidden files in `dotfiles/common`, including OpenCode and Codex agent configuration.
+Runtime-specific configs live under hidden files in `dotfiles/common`, including OpenCode and Codex configuration.

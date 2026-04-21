@@ -6,7 +6,7 @@ This file captures repository-specific structure and intent so coding agents can
 
 - Repository type: multi-host Nix flake covering NixOS and `nix-darwin`, with Home Manager used mainly as a package layer on top of shared system modules.
 - Main goal: keep host definitions small and composable while centralizing reusable packages, root-level system behavior, dotfiles, and platform-specific modules.
-- Primary use cases: workstation bootstrap, developer tool installation, desktop setup, shell/editor environment, and portable multiagent workflow configuration.
+- Primary use cases: workstation bootstrap, developer tool installation, desktop setup, shell/editor environment, and portable agent/runtime configuration.
 - Change priority: preserve evaluation stability first, then host portability, then ergonomics.
 
 ## Top-Level Layout
@@ -17,7 +17,6 @@ This file captures repository-specific structure and intent so coding agents can
 - `home/`: shared Home Manager configuration, package bundles, and dotfile activation.
 - `lib/`: helper functions for module scanning, platform checks, and dotfile merging.
 - `dotfiles/`: symlinked user config files, with `common/` plus platform overrides.
-- `docs/workflow/`: multiagent workflow specs and runtime adapter docs.
 
 ## Flake Model
 
@@ -130,18 +129,15 @@ Implication for new environments:
 
 - The repo no longer assumes only `$HOME/nixos`, but that location still remains the simplest default.
 
-## Workflow And Agent Files
+## Agent And Runtime Files
 
-- Canonical workflow docs live under `docs/workflow/`.
 - OpenCode runtime files live in `dotfiles/common/.config/opencode/`.
 - Codex runtime files live in `dotfiles/common/.codex/`.
-- Queue order is:
-  - `analyzer -> researcher -> planner -> coder -> reviewer -> tester -> technical-writer -> summarizer`
 
-When touching workflow files:
+When touching agent/runtime files:
 
-- Keep adapter behavior aligned across docs and dotfile runtime configs.
-- Avoid changing queue order or review/test semantics without updating docs and runtime config together.
+- Keep runtime behavior aligned with the actual platform configuration.
+- Treat `dotfiles/common/.codex/` as Codex configuration using main-thread ownership plus optional user-invoked read-only helper roles.
 
 ## Known Risks
 
