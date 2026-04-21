@@ -134,11 +134,6 @@ Implication for new environments:
 - OpenCode runtime files live in `dotfiles/common/.config/opencode/`.
 - Codex runtime files live in `dotfiles/common/.codex/`.
 
-When touching agent/runtime files:
-
-- Keep runtime behavior aligned with the actual platform configuration.
-- Treat `dotfiles/common/.codex/` as Codex configuration using main-thread ownership plus optional user-invoked read-only helper roles.
-
 ## Known Risks
 
 - Private `secrets` input blocks reproducibility on machines without SSH access to that repository.
@@ -151,9 +146,9 @@ When touching agent/runtime files:
 Run the smallest relevant checks after behavior changes:
 
 1. `nix flake check`
-2. `nixos-rebuild build --flake .#dev-4` for Linux shared changes
-3. `nixos-rebuild build --flake .#nixos` when touching that host
-4. `darwin-rebuild build --flake .#macix` for Darwin changes
+1. `nixos-rebuild build --flake .#dev-4` for Linux shared changes
+1. `nixos-rebuild build --flake .#nixos` when touching that host
+1. `darwin-rebuild build --flake .#macix` for Darwin changes
 
 If commands are unavailable or blocked by missing private inputs, report that explicitly.
 
