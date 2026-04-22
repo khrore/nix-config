@@ -24,64 +24,91 @@ Linter warnings are not ignorable by default. Treat any linter warning on touche
 
 ## Design Review Heuristics
 
-Use these principles when generating code, refactoring, and reviewing changes, not only after the fact. Treat them as heuristics, not dogma. Prefer the smallest change that reduces coupling, drift, and surprise.
+Use these as short programming rules when writing code, refactoring, and reviewing changes. Treat them as heuristics, not dogma. Prefer the smallest change that reduces coupling, drift, and surprise.
 
 ### SOLID
 
-- Treat `class` and `interface` loosely as any module, function boundary, schema, or provider contract.
-- `S`: keep one reason to change per unit.
-- `O`: prefer extension seams over repeated edits to stable core paths.
-- `L`: replacements must preserve caller expectations without special-casing.
-- `I`: keep APIs, options, and module surfaces narrow for each consumer.
-- `D`: keep policy dependent on abstractions, not concrete tools, paths, SDKs, or host details.
+- Apply these to modules, functions, schemas, and provider boundaries, not only OO classes.
+- `S`: give each unit one clear job and one main reason to change.
+- `O`: extend behavior through new modules, adapters, or options before editing stable core code.
+- `L`: make replacements work through the same contract without surprising callers.
+- `I`: keep interfaces small and focused; do not force consumers to depend on things they do not use.
+- `D`: depend on stable abstractions and contracts, not concrete tools, paths, SDKs, or environment details.
 
 ### Composition Over Inheritance (CRP)
 
-- Prefer `has-a` over `is-a` when sharing behavior.
-- Use inheritance only for true subtype relationships with stable shared defaults.
-- Review for fragile base classes, hierarchy explosion, and reuse achieved only through ancestry.
-- In mixed repos, prefer small composed modules, helpers, and adapters over monolithic base layers.
+- Prefer composing small helpers, modules, and adapters over deep inheritance trees.
+- Use inheritance only when the subtype relationship is real and shared behavior is stable.
+- Avoid fragile base classes, hierarchy sprawl, and reuse that only works through ancestry.
 
 ### DRY
 
-- Keep one authoritative representation for change-prone knowledge.
-- Review repeated rules, versions, paths, schemas, defaults, and exhaustive option lists.
-- Prefer derivation across code, config, CI, docs, and tests when churn is real.
-- Do not force brittle abstractions when local duplication is clearer and cheaper to maintain.
+- Keep one authoritative source for change-prone knowledge such as rules, defaults, schemas, versions, and paths.
+- Remove repeated logic when it is likely to drift.
+- Do not introduce brittle abstractions when a small local duplication is clearer and safer.
 
 ### KISS
 
-- Choose the simplest design that satisfies current requirements and is easy for an ordinary maintainer to inspect, debug, and repair.
-- Review hidden behavior, unnecessary indirection, special cases, and tool choices that are more powerful than the problem requires.
+- Choose the simplest design that satisfies the current requirement and is easy to inspect, debug, and repair.
+- Avoid unnecessary indirection, magic behavior, and tools that are more complex than the problem.
 - Keep boundaries obvious: config selects behavior, code implements behavior, scripts orchestrate.
 
 ### Law of Demeter
 
-- A unit should talk to itself, its direct inputs, directly owned collaborators, and values it creates.
-- Review chained calls, deep property access, layer skipping, and cross-boundary traversal.
-- Optimize for lower coupling, not literal dot-count; stay pragmatic for local plain-data transformations.
+- Keep units talking to direct collaborators, not reaching deep through object graphs or layers.
+- Reduce chaining, deep property access, and cross-boundary traversal when it increases coupling.
+- Stay pragmatic for simple data transformations, but prefer clear boundaries over convenience.
 
 ### Design by Contract
 
-- State what each public boundary expects on entry, guarantees on exit, and must preserve throughout.
-- Review preconditions, postconditions, invariants, side effects, and error modes for APIs, CLIs, schemas, env vars, and module boundaries.
-- Prefer executable contracts through types, assertions, schemas, and targeted tests where possible.
+- Make inputs, outputs, invariants, side effects, and error modes explicit at public boundaries.
+- Encode contracts in types, assertions, schemas, and targeted tests when possible.
+- Reject invalid states early and keep guarantees clear after the call returns.
 
 ### Encapsulation
 
-- Keep state with the operations that maintain it, and limit direct access to internals.
-- Review whether callers can bypass validation or rely on private structure, incidental defaults, or file layout.
-- Treat exported fields, functions, attrs, and options as public API surface that must stay intentionally small.
+- Keep state with the code that maintains it and limit direct access to internals.
+- Do not let callers bypass validation or depend on private structure or incidental defaults.
+- Keep exported surface area intentionally small.
 
 ### Command-Query Separation (CQS)
 
-- A callable should either change state or return information, but not both.
-- Review query-shaped operations for hidden writes, and command-shaped operations that double as the main read path.
-- Prefer explicit pairs such as `plan/apply`, `validate/fix`, `render/persist`, or `diff/write`.
-- Allow documented exceptions only when atomicity, concurrency, or ergonomics clearly justify them.
+- Separate reads from writes where practical: queries return data, commands change state.
+- Avoid hidden mutations in query-shaped APIs.
+- When both are needed, prefer explicit pairs such as `plan/apply`, `validate/fix`, or `render/persist`.
 
 ### Principle of Least Astonishment (POLA)
 
-- Make behavior match names, syntax, defaults, and local conventions.
-- Review surprising defaults, hidden context, nonstandard semantics, and cross-layer drift.
-- If surprising behavior is necessary, signal it explicitly in naming, comments, and docs instead of relying on tribal knowledge.
+- Make names, defaults, and behavior match local conventions and user expectations.
+- Avoid hidden context and surprising side effects.
+- If behavior is unusual but necessary, signal it clearly in naming, comments, and docs.
+
+### Linguistic Modular Units
+
+- Keep modules aligned with the language's natural units, such as files, functions, classes, packages, and schemas.
+- Do not hide core behavior behind ad hoc structure when the language already provides a clear boundary.
+- Make module boundaries easy to find and reason about in the codebase.
+
+### Self-Documentation
+
+- Write code so intent is visible from names, types, structure, and module layout before relying on comments.
+- Use comments to explain why or note non-obvious constraints, not to restate the code.
+- Keep examples, defaults, and contracts close to the code they describe.
+
+### Uniform Access
+
+- Expose similar capabilities through a consistent interface regardless of whether the result is stored or computed.
+- Do not force callers to care about internal implementation details.
+- Preserve stable calling patterns as implementations evolve.
+
+### Single Choice
+
+- Keep the exhaustive list of alternatives in one place.
+- Centralize choice logic for modes, variants, providers, feature flags, and enum-like branching.
+- Derive other behavior from that source instead of duplicating switch logic across the codebase.
+
+### Persistence Closure
+
+- When persisting an object or configuration, persist the dependent state needed to restore it correctly.
+- When loading persisted state, restore required dependencies together or fail clearly.
+- Avoid half-loaded state that appears valid but is missing necessary context.
